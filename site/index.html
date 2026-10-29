@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caffè in cuffia · Best Albums</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#111013; --surface:#17161a; --surface-2:#1e1d22; --line:rgba(230,229,215,.09);
+    --text:#e6e5d7; --muted:rgba(230,229,215,.45); --soft:rgba(230,229,215,.75); --accent:#ff8a3d; --title:'DM Sans',Inter,sans-serif;
+    --r-lg:24px; --r-md:14px; --r-pill:999px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  .wrap{max-width:1360px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+
+  /* Banner anteprima */
+  .preview{background:#1d1d20;color:var(--soft);font-size:13px;text-align:center;padding:9px 16px;border-bottom:1px solid var(--line)}
+  .preview b{color:var(--text);font-weight:600}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:20;background:rgba(17,16,19,.75);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid transparent;transition:border-color .3s}
+  header.scrolled{border-color:var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:78px}
+  .logo{white-space:nowrap;font-family:var(--title);font-weight:600;font-size:20px;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+  .logo i{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block}
+  nav{display:flex;gap:2px;background:var(--surface-2);border-radius:16px;padding:5px}
+  nav a{white-space:nowrap;font-size:15px;font-weight:500;padding:9px 18px;border-radius:12px;color:var(--muted);transition:color .25s,background .25s}
+  nav a span{opacity:.5;margin-right:6px;font-weight:500}
+  nav a:hover{color:var(--text)}
+  nav a.active{color:var(--bg);background:var(--text)}
+
+  /* Hero */
+  .hero{padding:clamp(70px,10vw,140px) 0 clamp(60px,8vw,110px);text-align:center;display:flex;flex-direction:column;align-items:center}
+  .eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:12px}
+  .eyebrow:before{content:"";width:28px;height:1px;background:var(--accent)}
+  h1{font-family:var(--title);font-size:clamp(46px,7.4vw,104px);line-height:1;letter-spacing:-.045em;font-weight:500;margin:28px 0 26px;max-width:13ch}
+  h1 em{font-style:normal;color:var(--muted)}
+  .lead{font-size:clamp(17px,1.5vw,20px);color:var(--soft);max-width:560px}
+  .stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:40px}
+  .stat{border:1px solid var(--line);border-radius:var(--r-pill);padding:12px 22px;font-size:14px;color:var(--soft)}
+  .stat b{color:var(--text);font-weight:700;margin-right:6px}
+
+  /* Sezioni */
+  section.view{display:none;padding-bottom:120px}
+  section.view.on{display:block}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;padding:20px 0 34px;border-top:1px solid var(--line)}
+  .head h2{font-family:var(--title);font-size:clamp(34px,4.4vw,60px);letter-spacing:-.04em;line-height:1.02;font-weight:500;margin-top:22px}
+  .head h2 span{color:var(--muted)}
+  .head p{color:var(--muted);max-width:420px;margin-top:12px}
+
+  /* Controlli */
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:34px}
+  .seg{display:inline-flex;background:var(--surface-2);border-radius:16px;padding:5px}
+  .seg button{padding:9px 18px;border-radius:12px;font-size:14px;font-weight:500;color:var(--muted);transition:all .25s var(--ease)}
+  .seg button.on{background:var(--text);color:var(--bg)}
+  .seg button:not(.on):hover{color:var(--text)}
+  .search{flex:1;min-width:200px;max-width:340px;margin-left:auto;position:relative}
+  .search input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 20px 14px 46px;color:var(--text);font:inherit;font-size:14px;outline:none;transition:border-color .25s}
+  .search input:focus{border-color:rgba(255,255,255,.3)}
+  .search svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);opacity:.5}
+  .count{font-size:14px;color:var(--muted)}
+
+  /* Griglia e schede */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 12px 20px;display:flex;flex-direction:column;transition:background .35s var(--ease),transform .45s var(--ease),border-color .35s;opacity:0;transform:translateY(18px)}
+  .card.in{opacity:1;transform:none}
+  .card:hover{background:var(--surface-2);border-color:rgba(255,255,255,.14)}
+  .cover{aspect-ratio:1;border-radius:var(--r-md);overflow:hidden;position:relative}
+  .cover .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+  .card:hover .art{transform:scale(1.06)}
+  .cover .go{position:absolute;right:12px;bottom:12px;width:46px;height:46px;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center;transform:scale(.6);opacity:0;transition:all .4s var(--ease)}
+  .card:hover .go{transform:scale(1);opacity:1}
+  .cover .tag{position:absolute;left:12px;top:12px;background:var(--text);color:var(--bg);font-size:12px;font-weight:600;padding:6px 12px;border-radius:var(--r-pill)}
+  .meta{padding:16px 8px 0}
+  .meta h3{font-family:var(--title);font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+  .meta .by{color:var(--soft);font-size:14px;margin-top:3px}
+  .meta .sub{color:var(--muted);font-size:13px;margin-top:12px;display:flex;gap:8px;align-items:center}
+  .meta .sub i{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+  .empty{color:var(--muted);padding:60px 0;text-align:center;grid-column:1/-1}
+
+  /* Copertine segnaposto */
+  .art.ph{display:flex;align-items:flex-end;padding:18px;font-family:var(--title);font-weight:600;font-size:30px;letter-spacing:-.04em;line-height:.95;color:rgba(255,255,255,.92)}
+  .art.mosaic{display:grid;grid-template-columns:1fr 1fr}
+  .art.mosaic div{width:100%;height:100%}
+
+  /* Top 10 in arrivo */
+  .soon{margin-top:80px;border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(28px,4vw,56px);display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;align-items:center;background:radial-gradient(120% 140% at 0% 0%,rgba(124,196,176,.10),transparent 55%),var(--surface)}
+  .soon h3{font-family:var(--title);font-size:clamp(26px,3vw,42px);letter-spacing:-.035em;font-weight:500;line-height:1.05}
+  .soon p{color:var(--muted);max-width:460px;margin-top:10px}
+  .pill{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:var(--r-pill);padding:14px 24px;font-weight:600;font-size:14px;color:var(--soft)}
+
+  .phero{padding:clamp(60px,9vw,120px) 0 clamp(40px,5vw,64px);border-bottom:1px solid var(--line);margin-bottom:34px}
+  .phero h1{max-width:14ch;margin:24px 0 22px}
+  .phero .stats{justify-content:flex-start;margin-top:32px}
+  .doors{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding-bottom:120px}
+  .door{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;overflow:hidden;transition:background .35s var(--ease),border-color .35s}
+  .door:hover{background:var(--surface-2);border-color:rgba(230,229,215,.16)}
+  .door-art{aspect-ratio:16/10;border-radius:var(--r-md);overflow:hidden;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr)}
+  .door-art div{transition:transform .8s var(--ease)}
+  .door:hover .door-art div{transform:scale(1.06)}
+  .door-txt{padding:24px 12px 12px}
+  .door-txt h2{font-family:var(--title);font-weight:500;font-size:clamp(30px,3.4vw,46px);letter-spacing:-.04em;line-height:1;margin-top:14px}
+  .door-txt p{color:var(--muted);margin-top:10px}
+  .go-big{position:absolute;right:28px;bottom:28px;width:56px;height:56px;border-radius:50%;border:1px solid rgba(230,229,215,.2);display:grid;place-items:center;transition:all .4s var(--ease)}
+  .door:hover .go-big{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+  @media (max-width:800px){.doors{grid-template-columns:1fr}}
+  /* Pannello dettaglio */
+  .scrim{position:fixed;inset:0;background:rgba(8,8,10,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s var(--ease);z-index:40}
+  .scrim.on{opacity:1;pointer-events:auto}
+  .panel{position:fixed;top:12px;right:12px;bottom:12px;width:min(520px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);z-index:41;transform:translateX(calc(100% + 24px));transition:transform .5s var(--ease);display:flex;flex-direction:column;overflow:hidden}
+  .panel.on{transform:none}
+  .p-top{display:flex;gap:18px;padding:18px;align-items:flex-end;border-bottom:1px solid var(--line)}
+  .p-cover{width:132px;flex:none;aspect-ratio:1;border-radius:var(--r-md);overflow:hidden;position:relative}
+  .p-cover .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.p-cover .art.ph{font-size:18px;padding:12px}
+  .p-top h3{font-family:var(--title);font-weight:500;font-size:28px;letter-spacing:-.035em;line-height:1.05}
+  .p-top .by{color:var(--soft);margin-top:6px}.p-top .sub{color:var(--muted);font-size:13px;margin-top:8px}
+  .p-close{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;color:var(--soft)}
+  .p-close:hover{color:var(--text)}
+  .p-player{margin:18px 18px 0;border-radius:var(--r-md);overflow:hidden;background:var(--surface-2);min-height:152px;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;padding:0}
+  .p-player iframe{width:100%;height:152px;border:0;display:block}
+  .p-player .ph-player{padding:22px;display:flex;align-items:center;gap:16px;width:100%;text-align:left}
+  .p-player .ph-play{width:52px;height:52px;flex:none;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center}
+  .p-list{flex:1;overflow:auto;padding:10px 10px 18px}
+  .p-list ol{list-style:none;counter-reset:t}
+  .p-list li{counter-increment:t;display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:11px 10px;border-radius:12px;font-size:14px}
+  .p-list li:hover{background:var(--surface-2)}
+  .p-list li:before{content:counter(t);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .p-list li b{font-weight:500;display:block}.p-list li small{color:var(--muted);font-size:13px}
+  .p-list li span{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+  .p-foot{padding:14px 18px 18px;border-top:1px solid var(--line)}
+  .p-foot .btn{width:100%;justify-content:center}
+  .badge{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--surface-2);background:var(--surface);border-radius:var(--r-pill);padding:4px 14px 4px 4px;font-size:14px;color:var(--soft)}
+  .badge b{background:var(--text);color:var(--bg);font-weight:500;font-size:12px;padding:3px 10px;border-radius:var(--r-pill)}
+  .btn{display:inline-flex;align-items:center;gap:12px;background:var(--text);color:var(--bg);border-radius:16px;padding:10px 22px 10px 10px;font-weight:500;font-size:15px}
+  .btn i{width:30px;height:30px;border-radius:50%;background:var(--bg);color:var(--text);display:grid;place-items:center}
+  .ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:36px}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(230,229,215,.2);padding:14px 24px}
+  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  @media (max-width:700px){
+    .bar{height:66px}
+    .logo{font-size:16px}.logo span{display:none}
+    nav{padding:4px}
+    nav a{padding:8px 12px;font-size:13px}
+    nav a span{display:none}
+    .search{max-width:none;margin-left:0;flex-basis:100%}
+    .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+    .card{padding:8px 8px 14px;border-radius:20px}
+    .meta{padding:12px 4px 0}.meta h3{font-size:15px}
+    .art.ph{font-size:20px;padding:12px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}.card{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="preview"><b>Anteprima</b> · titoli, copertine e date sono di esempio. I dati veri arrivano dal tuo Spotify.</div>
+
+<header id="top">
+  <div class="wrap bar">
+    <a class="logo" href="#home"><i></i><b style="font-weight:inherit">Estefania<span> · ascolti</span></b></a>
+    <nav>
+      <a href="#caffe-in-cuffia" data-v="caffe-in-cuffia"><span>01.</span>Caffè in cuffia</a>
+      <a href="#best-albums" data-v="best-albums"><span>02.</span>Best Albums</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="view" id="v-home">
+    <div class="hero">
+      <a class="badge" href="#best-albums"><b>Nuovo</b>Best Albums 2026 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 6 6 6-6 6"/></svg></a>
+      <h1>Musica da bere <em>lentamente.</em></h1>
+      <p class="lead">Le playlist che creo da anni per accompagnare il caffè, e gli album che mi hanno segnato l'anno. Si ascoltano qui, oppure su Spotify.</p>
+    </div>
+    <div class="doors">
+      <a class="door" href="#caffe-in-cuffia">
+        <div class="door-art mosaic4" id="door-c"></div>
+        <div class="door-txt"><div class="eyebrow">01.</div><h2>Caffè in cuffia</h2><p id="door-c-n"></p></div>
+        <span class="go-big"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+      <a class="door" href="#best-albums">
+        <div class="door-art mosaic4" id="door-a"></div>
+        <div class="door-txt"><div class="eyebrow">02.</div><h2>Best Albums</h2><p id="door-a-n"></p></div>
+        <span class="go-big"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="view" id="v-caffe-in-cuffia">
+    <div class="phero">
+      <div class="eyebrow">01. Caffè in cuffia</div>
+      <h1>Una tazza, <em>una playlist.</em></h1>
+      <p class="lead">Oltre trecento playlist, una per ogni caffè. Dalla più recente alla prima, oppure in ordine alfabetico.</p>
+      <div class="stats" id="c-stats"></div>
+    </div>
+    <div class="controls">
+      <div class="seg" data-group="c-sort">
+        <button class="on" data-val="recenti">Più recenti</button>
+        <button data-val="az">A-Z</button>
+      </div>
+      <span class="count" id="c-count"></span>
+      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="c-q" placeholder="Cerca una playlist"></label>
+    </div>
+    <div class="grid" id="c-grid"></div>
+  </section>
+
+  <section class="view" id="v-best-albums">
+    <div class="phero">
+      <div class="eyebrow">02. Best Albums</div>
+      <h1>Gli album <em>dell'anno.</em></h1>
+      <p class="lead">Ogni album che ha meritato un posto fisso nei miei ascolti, anno per anno.</p>
+      <div class="stats" id="a-stats"></div>
+    </div>
+    <div class="controls">
+      <div class="seg" data-group="a-year">
+        <button class="on" data-val="2026">2026</button>
+        <button data-val="2025">2025</button>
+      </div>
+      <div class="seg" data-group="a-sort">
+        <button class="on" data-val="uscita">Data d'uscita</button>
+        <button data-val="az">A-Z</button>
+      </div>
+      <span class="count" id="a-count"></span>
+      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="a-q" placeholder="Cerca album o artista"></label>
+    </div>
+    <div class="grid" id="a-grid"></div>
+
+    <div class="soon">
+      <div>
+        <div class="eyebrow">In arrivo</div>
+        <h3 style="margin-top:14px">La mia top 10,<br><span style="color:var(--muted)">sempre aggiornata.</span></h3>
+        <p>Una classifica che si aggiorna da sola in base a quanto ascolto davvero ogni album.</p>
+      </div>
+      <span class="btn"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Presto qui</span>
+    </div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="p-close" id="p-close" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <div class="p-top"><div class="p-cover" id="p-cover"></div><div><h3 id="p-title"></h3><div class="by" id="p-by"></div><div class="sub" id="p-sub"></div></div></div>
+  <div class="p-player" id="p-player"></div>
+  <div class="p-list"><ol id="p-list"></ol></div>
+  <div class="p-foot"><a class="btn" id="p-open" href="#" target="_blank" rel="noopener"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Apri su Spotify</a></div>
+</aside>
+
+<footer><div class="wrap"><span>© 2026 Estefania Zappatore</span><span>Musica via Spotify</span></div></footer>
+
+<script>
+/* =========================================================
+   Dati: in produzione arrivano da data.json (aggiornato ogni notte).
+   Se data.json non c'è (anteprima), si usano dati di esempio.
+   ========================================================= */
+const PALETTE=[["#1a2233","#4b6fa5"],["#2a1d14","#d9823b"],["#13202b","#3f7f9c"],["#2b2219","#c9a27a"],["#151c2e","#6b84c4"],["#2e1f12","#f0a15a"],["#1b2430","#8ea3bf"],["#24201b","#b89c7c"],["#101a28","#2f6f9f"],["#2a1a10","#e07a3a"],["#1f2530","#a8b4c4"],["#1d1813","#9c7a5a"]];
+const rnd=i=>Math.abs((Math.sin(i*9301+49297)*233280)%1);
+function sampleData(){
+  const W=["Nebbia","Ore piccole","Velluto","Seconda tazza","Porto lento","Luce obliqua","Sale","Mezzanotte","Terra cruda","Specchi","Onde corte","Polvere d'oro","Rito","Fumo","Lino","Ruggine","Brina","Eco"];
+  const AR=["Artista di esempio","Band di esempio","Collettivo esempio","Duo esempio"];
+  const T=["Mattina presto","Vapore","Seconda tazza","Crema","Sottovoce","Finestra aperta","Lungo","Tostatura","Piano","Ritorno","Schiuma","Ultimo sorso","Ombre","Grani","Calma","Notturno"];
+  const tr=(n,seed,artist)=>Array.from({length:n},(_,i)=>({t:T[(seed+i*3)%T.length],a:artist||AR[(seed+i)%AR.length],ms:(150+Math.floor(rnd(seed*31+i)*150))*1000}));
+  const albums=[],playlists=[];
+  [["2026",24],["2025",16]].forEach(([y,n],k)=>{for(let i=0;i<n;i++){const s=i+k*40,ar=AR[s%AR.length];
+    albums.push({year:y,title:W[(s*7)%W.length]+(i>=W.length?" II":""),artist:ar,date:`${y}-${String(1+Math.floor(rnd(s)*10)).padStart(2,"0")}-${String(1+Math.floor(rnd(s+3)*27)).padStart(2,"0")}`,
+      tracks:tr(6+Math.floor(rnd(s+5)*10),s,ar),img:null,pal:PALETTE[s%12],id:null,url:"https://open.spotify.com"});}});
+  for(let i=0;i<18;i++){const n=318-i;
+    playlists.push({title:`Caffè in cuffia #${n}`,num:n,date:`2026-${String(10-Math.floor(i/2)).padStart(2,"0")}-01`,tracks:tr(12+Math.floor(rnd(i+90)*14),i+50),img:null,
+      pals:[PALETTE[i%12],PALETTE[(i+3)%12],PALETTE[(i+6)%12],PALETTE[(i+9)%12]],id:null,url:"https://open.spotify.com"});}
+  return {sample:true,albums,playlists};
+}
+
+let DATA, albums=[], playlists=[];
+const MESI=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+const fmt=d=>{if(!d)return "";const [y,m,g]=d.split("-");return g?`${+g} ${MESI[m-1]} ${y}`:m?`${MESI[m-1]} ${y}`:y};
+const dur=ms=>{const s=Math.round(ms/1000);return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`};
+const mins=t=>Math.round(t.reduce((x,y)=>x+y.ms,0)/60000);
+const arrow='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const state={"c-sort":"recenti","a-year":"2026","a-sort":"uscita"};
+const grad=p=>`background:linear-gradient(145deg,${p[0]},${p[1]})`;
+
+function artAlbum(a){return a.img?`<img class="art" src="${a.img}" alt="" loading="lazy">`:`<div class="art ph" style="${grad(a.pal)}">${esc(a.title)}</div>`}
+function artPlaylist(p){return p.img?`<img class="art" src="${p.img}" alt="" loading="lazy">`:`<div class="art mosaic">${p.pals.map(c=>`<div style="${grad(c)}"></div>`).join("")}</div>`}
+
+function albumCard(a){
+  return `<a class="card" href="#" data-kind="a" data-i="${albums.indexOf(a)}">
+    <div class="cover">${artAlbum(a)}<span class="go">${arrow}</span></div>
+    <div class="meta"><h3>${esc(a.title)}</h3><div class="by">${esc(a.artist)}</div>
+    <div class="sub">${fmt(a.date)}<i></i>${a.tracks.length} brani</div></div></a>`;
+}
+function playlistCard(p){
+  return `<a class="card" href="#" data-kind="c" data-i="${playlists.indexOf(p)}">
+    <div class="cover">${artPlaylist(p)}${p.num?`<span class="tag">#${p.num}</span>`:""}<span class="go">${arrow}</span></div>
+    <div class="meta"><h3>${esc(p.title)}</h3>
+    <div class="sub">${p.tracks.length} brani<i></i>${mins(p.tracks)} min</div></div></a>`;
+}
+function reveal(grid){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{rootMargin:"0px 0px -40px"});
+  [...grid.children].forEach((c,i)=>{c.style.transitionDelay=(i%8)*40+"ms";io.observe(c)});
+}
+function renderC(){
+  const q=document.getElementById("c-q").value.trim().toLowerCase();
+  let list=playlists.filter(p=>p.title.toLowerCase().includes(q));
+  list.sort(state["c-sort"]==="az"?(a,b)=>a.title.localeCompare(b.title,"it",{numeric:true}):(a,b)=>(b.num||0)-(a.num||0)||(b.date||"").localeCompare(a.date||""));
+  const g=document.getElementById("c-grid");
+  g.innerHTML=list.length?list.map(playlistCard).join(""):'<p class="empty">Nessuna playlist trovata.</p>';
+  document.getElementById("c-count").textContent=list.length+" playlist";
+  reveal(g);
+}
+function renderA(){
+  const q=document.getElementById("a-q").value.trim().toLowerCase();
+  let list=albums.filter(a=>a.year===state["a-year"]&&(a.title+" "+a.artist).toLowerCase().includes(q));
+  list.sort(state["a-sort"]==="az"?(a,b)=>a.title.localeCompare(b.title,"it"):(a,b)=>(b.date||"").localeCompare(a.date||""));
+  const g=document.getElementById("a-grid");
+  g.innerHTML=list.length?list.map(albumCard).join(""):'<p class="empty">Nessun album trovato.</p>';
+  document.getElementById("a-count").textContent=list.length+" album";
+  reveal(g);
+}
+document.querySelectorAll(".seg").forEach(seg=>seg.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  seg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  state[seg.dataset.group]=b.dataset.val;
+  seg.dataset.group.startsWith("c")?renderC():renderA();
+}));
+document.getElementById("c-q").addEventListener("input",renderC);
+document.getElementById("a-q").addEventListener("input",renderA);
+
+function fillIntro(){
+  const n26=albums.filter(a=>a.year==="2026").length,n25=albums.filter(a=>a.year==="2025").length;
+  const nt=playlists.reduce((t,p)=>t+p.tracks.length,0);
+  document.getElementById("c-stats").innerHTML=`<span class="stat"><b>${playlists.length}</b>playlist</span><span class="stat"><b>${nt.toLocaleString("it-IT")}</b>brani</span>`;
+  document.getElementById("a-stats").innerHTML=`<span class="stat"><b>${n26}</b>album del 2026</span><span class="stat"><b>${n25}</b>album del 2025</span>`;
+  document.getElementById("door-c-n").textContent=playlists.length+" playlist, una per ogni caffè";
+  document.getElementById("door-a-n").textContent=`${n26} album del 2026 · ${n25} del 2025`;
+  const tileA=a=>a.img?`<div><img src="${a.img}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:`<div style="${grad(a.pal)}"></div>`;
+  const tileP=p=>p.img?`<div><img src="${p.img}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:`<div style="${grad(p.pals[0])}"></div>`;
+  document.getElementById("door-c").innerHTML=[...playlists].sort((a,b)=>(b.num||0)-(a.num||0)).slice(0,8).map(tileP).join("");
+  document.getElementById("door-a").innerHTML=albums.filter(a=>a.year==="2026").sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,8).map(tileA).join("");
+  if(!DATA.sample){const pv=document.querySelector(".preview");if(pv)pv.remove();}
+}
+
+/* ---------- Pannello dettaglio con tracklist e player ---------- */
+const panel=document.getElementById("panel"),scrim=document.getElementById("scrim");
+function openPanel(kind,i){
+  const it=kind==="a"?albums[i]:playlists[i];
+  document.getElementById("p-cover").innerHTML=kind==="a"?artAlbum(it):artPlaylist(it);
+  document.getElementById("p-title").textContent=it.title;
+  document.getElementById("p-by").textContent=kind==="a"?it.artist:"Playlist di Estefania";
+  document.getElementById("p-sub").textContent=kind==="a"?`${fmt(it.date)} · ${it.tracks.length} brani`:`${it.tracks.length} brani · ${mins(it.tracks)} min`;
+  const pl=document.getElementById("p-player");
+  pl.innerHTML=it.id
+    ?`<iframe src="https://open.spotify.com/embed/${kind==="a"?"album":"playlist"}/${it.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`
+    :`<div class="ph-player"><span class="ph-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><div><b style="color:var(--text);font-weight:500">Qui c'è il player di Spotify</b><br>Sul sito pubblicato si ascolta direttamente da questa scheda.</div></div>`;
+  document.getElementById("p-list").innerHTML=it.tracks.map(x=>`<li><div><b>${esc(x.t)}</b><small>${esc(x.a)}</small></div><span>${dur(x.ms)}</span></li>`).join("");
+  document.getElementById("p-open").href=it.url;
+  panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
+  panel.querySelector(".p-list").scrollTop=0;
+}
+function closePanel(){panel.classList.remove("on");scrim.classList.remove("on");panel.setAttribute("aria-hidden","true");document.getElementById("p-player").innerHTML=""}
+document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]");if(c){e.preventDefault();openPanel(c.dataset.kind,+c.dataset.i)}});
+scrim.addEventListener("click",closePanel);document.getElementById("p-close").addEventListener("click",closePanel);
+addEventListener("keydown",e=>{if(e.key==="Escape")closePanel()});
+
+/* ---------- Navigazione: /caffeincuffia e /best-albums sul sito, #hash in anteprima ---------- */
+const ROUTES={"caffeincuffia":"caffe-in-cuffia","caffe-in-cuffia":"caffe-in-cuffia","best-albums":"best-albums"};
+function currentView(){
+  const p=location.pathname.replace(/\/+$/,"").split("/").pop();
+  return ROUTES[location.hash.slice(1)]||ROUTES[p]||"home";
+}
+function route(){
+  const v=currentView();
+  document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
+  document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("active",a.dataset.v===v));
+  if(v==="best-albums")renderA(); else if(v==="caffe-in-cuffia")renderC();
+  closePanel();window.scrollTo(0,0);
+}
+addEventListener("hashchange",route);
+addEventListener("scroll",()=>document.getElementById("top").classList.toggle("scrolled",scrollY>10),{passive:true});
+
+(async()=>{
+  try{const r=await fetch("/data.json",{cache:"no-cache"});if(!r.ok)throw 0;DATA=await r.json();}
+  catch(e){DATA=sampleData();}
+  albums=DATA.albums;playlists=DATA.playlists;
+  albums.forEach((a,i)=>a.pal=a.pal||PALETTE[i%12]);
+  playlists.forEach((p,i)=>p.pals=p.pals||[PALETTE[i%12],PALETTE[(i+3)%12],PALETTE[(i+6)%12],PALETTE[(i+9)%12]]);
+  if(!DATA.sample){ /* sito vero: indirizzi puliti /caffeincuffia e /best-albums */
+    const P={"#home":"/","#caffe-in-cuffia":"/caffeincuffia","#best-albums":"/best-albums"};
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{const h=a.getAttribute("href");if(P[h]){a.setAttribute("href",P[h]);a.addEventListener("click",e=>{e.preventDefault();history.pushState(null,"",P[h]);route();})}});
+    addEventListener("popstate",route);
+  }
+  fillIntro();route();
+})();
+</script>
+</body>
+</html>
