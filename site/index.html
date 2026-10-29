@@ -239,7 +239,7 @@
         <button data-val="az">A-Z</button>
       </div>
       <span class="count" id="c-count"></span>
-      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="c-q" placeholder="Cerca una playlist"></label>
+      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="c-q" placeholder="Cerca playlist, artista o brano"></label>
     </div>
     <div class="grid" id="c-grid"></div>
     <div style="height:80px"></div>
@@ -357,7 +357,7 @@ function playlistCard(p){
   return `<a class="card" href="#" data-kind="c" data-i="${playlists.indexOf(p)}">
     <div class="cover">${artPlaylist(p)}${p.num?`<span class="tag">#${p.num}</span>`:""}<span class="go">${arrow}</span></div>
     <div class="meta"><h3>${esc(p.title)}</h3>
-    <div class="sub">${p.tracks.length} brani<i></i>${mins(p.tracks)} min</div></div></a>`;
+    <div class="sub">${p._hit?`Con ${esc(p._hit)}`:`${p.tracks.length} brani<i></i>${mins(p.tracks)} min`}</div></div></a>`;
 }
 function reveal(grid){
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{rootMargin:"0px 0px -40px"});
@@ -365,7 +365,11 @@ function reveal(grid){
 }
 function renderC(){
   const q=document.getElementById("c-q").value.trim().toLowerCase();
-  let list=playlists.filter(p=>p.title.toLowerCase().includes(q));
+  const hit=p=>{if(!q)return null;if(p.title.toLowerCase().includes(q))return "";
+    const t=p.tracks.find(x=>x.a.toLowerCase().includes(q)||x.t.toLowerCase().includes(q));
+    return t?(t.a.toLowerCase().includes(q)?t.a.split(", ").find(a=>a.toLowerCase().includes(q))||t.a:t.t):null};
+  let list=playlists.filter(p=>!q||hit(p)!==null);
+  playlists.forEach(p=>p._hit=q?hit(p):null);
   list.sort(state["c-sort"]==="az"?(a,b)=>a.title.localeCompare(b.title,"it",{numeric:true}):(a,b)=>(b.num||0)-(a.num||0)||(b.date||"").localeCompare(a.date||""));
   const g=document.getElementById("c-grid");
   g.innerHTML=list.length?list.map(playlistCard).join(""):'<p class="empty">Nessuna playlist trovata.</p>';
