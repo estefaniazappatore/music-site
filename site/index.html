@@ -161,7 +161,8 @@
   .now .lbl{display:inline-flex;align-items:center;gap:8px;color:var(--muted);white-space:nowrap}
   .now .pulse{width:8px;height:8px;border-radius:50%;background:#f08bc8;box-shadow:0 0 0 0 rgba(240,139,200,.6);animation:pulse 2s infinite}
   .now.idle .pulse{animation:none;background:var(--muted);box-shadow:none}
-  .now .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .now .tx{line-height:1.35}
+  @media (max-width:700px){.now a{flex-wrap:wrap;row-gap:4px;text-align:center}.now .tx{flex-basis:100%}}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(240,139,200,.55)}70%{box-shadow:0 0 0 8px rgba(240,139,200,0)}100%{box-shadow:0 0 0 0 rgba(240,139,200,0)}}
   /* Top 10 */
   .top10{margin:0 0 80px;border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(24px,3.5vw,48px);background:var(--surface)}
