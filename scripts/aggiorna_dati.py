@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG = json.loads((ROOT / "scripts" / "config.json").read_text(encoding="utf-8"))
 CACHE_FILE = ROOT / "scripts" / "cache.json"
 OUT_FILE = ROOT / "site" / "data.json"
-SCOPE = "playlist-read-private playlist-read-collaborative"
+SCOPE = "playlist-read-private playlist-read-collaborative user-top-read"
 
 
 class LimiteRaggiunto(Exception):
@@ -190,8 +190,20 @@ def main():
     unici = {}
     for a in albums:
         unici.setdefault((a["id"], a["year"]), a)
+    top = []
+    try:
+        for t in chiama(sp.current_user_top_tracks, limit=10, time_range="short_term")["items"]:
+            imgs = (t.get("album") or {}).get("images") or []
+            top.append({"id": t["id"], "t": t["name"], "a": ", ".join(a["name"] for a in t["artists"]),
+                        "img": (imgs[1] if len(imgs) > 1 else imgs[0])["url"] if imgs else None,
+                        "url": t["external_urls"]["spotify"]})
+    except Exception as e:
+        print("Top 10 non disponibile:", e)
+        vecchio = json.loads(OUT_FILE.read_text(encoding="utf-8")) if OUT_FILE.exists() else {}
+        top = vecchio.get("top", [])
     data = {
         "updated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
+        "top": top,
         "albums": list(unici.values()),
         "playlists": playlists,
     }

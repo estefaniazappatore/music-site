@@ -30,7 +30,8 @@
   header.scrolled{border-color:var(--line)}
   .bar{display:flex;align-items:center;justify-content:space-between;height:78px}
   .logo{white-space:nowrap;font-family:var(--title);font-weight:600;font-size:20px;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
-  .logo i{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block}
+  .logo i{width:26px;height:26px;border-radius:50%;display:inline-block;background:conic-gradient(from 210deg,#f08bc8,#c58fd6,#86a9e0,#d8f5ee,#fbe9b8,#f08bc8);filter:saturate(1.05);box-shadow:0 0 18px rgba(240,139,200,.35)}
+  .logo b{font-weight:600}.logo em{font-style:normal;color:var(--muted);margin-left:-4px}
   nav{display:flex;gap:2px;background:var(--surface-2);border-radius:16px;padding:5px}
   nav a{white-space:nowrap;font-size:15px;font-weight:500;padding:9px 18px;border-radius:12px;color:var(--muted);transition:color .25s,background .25s}
   nav a span{opacity:.5;margin-right:6px;font-weight:500}
@@ -100,7 +101,7 @@
   .phero{padding:clamp(60px,9vw,120px) 0 clamp(40px,5vw,64px);border-bottom:1px solid var(--line);margin-bottom:34px}
   .phero h1{max-width:14ch;margin:24px 0 22px}
   .phero .stats{justify-content:flex-start;margin-top:32px}
-  .doors{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding-bottom:120px}
+  .doors{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding-bottom:80px}
   .door{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;overflow:hidden;transition:background .35s var(--ease),border-color .35s}
   .door:hover{background:var(--surface-2);border-color:rgba(230,229,215,.16)}
   .door-art{aspect-ratio:16/10;border-radius:var(--r-md);overflow:hidden;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr)}
@@ -151,18 +152,46 @@
   .nl .ok{display:none;font-family:var(--title);font-size:22px;letter-spacing:-.02em}
   .nl.done form{display:none}.nl.done .ok{display:block}
   @media (max-width:800px){.nl{grid-template-columns:1fr}}
+  /* In cuffia adesso */
+  .now{display:none;border-bottom:1px solid var(--line);background:rgba(23,22,26,.9)}
+  .now.on{display:block}
+  .now a{display:flex;align-items:center;gap:12px;max-width:1360px;margin:0 auto;padding:9px clamp(20px,4vw,56px);font-size:13.5px;color:var(--soft)}
+  .now img{width:28px;height:28px;border-radius:6px;object-fit:cover}
+  .now b{color:var(--text);font-weight:500}
+  .now .lbl{display:inline-flex;align-items:center;gap:8px;color:var(--muted);white-space:nowrap}
+  .now .pulse{width:8px;height:8px;border-radius:50%;background:#f08bc8;box-shadow:0 0 0 0 rgba(240,139,200,.6);animation:pulse 2s infinite}
+  .now.idle .pulse{animation:none;background:var(--muted);box-shadow:none}
+  .now .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(240,139,200,.55)}70%{box-shadow:0 0 0 8px rgba(240,139,200,0)}100%{box-shadow:0 0 0 0 rgba(240,139,200,0)}}
+  /* Top 10 */
+  .top10{margin:0 0 80px;border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(24px,3.5vw,48px);background:var(--surface)}
+  .top10 h3{font-family:var(--title);font-weight:500;font-size:clamp(28px,3.2vw,44px);letter-spacing:-.04em;line-height:1.02;margin:14px 0 6px}
+  .top10 h3 span{color:var(--muted)}
+  .top10 .lead2{color:var(--muted);margin-bottom:24px}
+  .top10 ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:4px 28px}
+  .top10 li a{display:grid;grid-template-columns:30px 48px 1fr auto;gap:14px;align-items:center;padding:9px 10px;border-radius:14px;transition:background .25s}
+  .top10 li a:hover{background:var(--surface-2)}
+  .top10 .rk{font-family:var(--title);font-size:20px;color:var(--muted);text-align:right}
+  .top10 img,.top10 .ph{width:48px;height:48px;border-radius:10px;object-fit:cover}
+  .top10 b{display:block;font-weight:500;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top10 small{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .top10 .pl{opacity:0;transition:opacity .25s;color:var(--text)}
+  .top10 li a:hover .pl{opacity:1}
+  @media (max-width:800px){.top10 ol{grid-template-columns:1fr}}
   .badge{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--surface-2);background:var(--surface);border-radius:var(--r-pill);padding:4px 14px 4px 4px;font-size:14px;color:var(--soft)}
   .badge b{background:var(--text);color:var(--bg);font-weight:500;font-size:12px;padding:3px 10px;border-radius:var(--r-pill)}
   .btn{display:inline-flex;align-items:center;gap:12px;background:var(--text);color:var(--bg);border-radius:16px;padding:10px 22px 10px 10px;font-weight:500;font-size:15px}
   .btn i{width:30px;height:30px;border-radius:50%;background:var(--bg);color:var(--text);display:grid;place-items:center}
   .ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:36px}
   .btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(230,229,215,.2);padding:14px 24px}
+  footer .disc{max-width:520px;text-align:right}
+  @media (max-width:700px){footer .disc{text-align:left}}
   footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 
   @media (max-width:700px){
     .bar{height:66px}
-    .logo{font-size:16px}.logo span{display:none}
+    .logo{font-size:16px}.logo i{width:20px;height:20px}
     nav{padding:4px}
     nav a{padding:8px 12px;font-size:13px}
     nav a span{display:none}
@@ -179,9 +208,10 @@
 
 <div class="preview"><b>Anteprima</b> · titoli, copertine e date sono di esempio. I dati veri arrivano dal tuo Spotify.</div>
 
+<div class="now" id="now"><a href="#" id="now-a" target="_blank" rel="noopener"><span class="lbl"><span class="pulse"></span><span id="now-lbl">In cuffia adesso</span></span><img id="now-img" alt=""><span class="tx"><b id="now-t"></b> · <span id="now-ar"></span></span></a></div>
 <header id="top">
   <div class="wrap bar">
-    <a class="logo" href="#home"><i></i><b style="font-weight:inherit">Estefania<span> · ascolti</span></b></a>
+    <a class="logo" href="#home"><i></i><b>Caffè</b><em>in cuffia</em></a>
     <nav>
       <a href="#caffe-in-cuffia" data-v="caffe-in-cuffia"><span>01.</span>Caffè in cuffia</a>
       <a href="#best-albums" data-v="best-albums"><span>02.</span>Best Albums</a>
@@ -208,22 +238,12 @@
         <span class="go-big"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
       </a>
     </div>
-<div class="nl" style="margin-top:-60px" data-nl>
-  <div>
-    <div class="eyebrow">Newsletter</div>
-    <h3>Un caffè, ogni lunedì. <span>In cuffia.</span></h3>
-    <p>Ogni lunedì mattina una Caffè in cuffia da ascoltare con il primo caffè della settimana, più gli album nuovi entrati tra i miei preferiti.</p>
-  </div>
-  <div>
-    <form>
-      <input name="first_name" type="text" placeholder="Nome (facoltativo)" autocomplete="given-name">
-      <input name="email_address" type="email" placeholder="La tua email" required autocomplete="email">
-      <button class="btn" type="submit"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Iscriviti</button>
-      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic.</small>
-    </form>
-    <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
-  </div>
-</div>
+    <div class="top10" id="top10" style="display:none">
+      <div class="eyebrow">La mia top 10</div>
+      <h3>I brani del mese. <span>Più ascoltati.</span></h3>
+      <p class="lead2">I 10 brani che ho ascoltato di più nelle ultime settimane, aggiornati ogni notte.</p>
+      <ol id="top10-list"></ol>
+    </div>
   </section>
 
   <section class="view" id="v-caffe-in-cuffia">
@@ -243,22 +263,7 @@
     </div>
     <div class="grid" id="c-grid"></div>
     <div style="height:80px"></div>
-<div class="nl" data-nl>
-  <div>
-    <div class="eyebrow">Newsletter</div>
-    <h3>Un caffè, ogni lunedì. <span>In cuffia.</span></h3>
-    <p>Ogni lunedì mattina una Caffè in cuffia da ascoltare con il primo caffè della settimana, più gli album nuovi entrati tra i miei preferiti.</p>
-  </div>
-  <div>
-    <form>
-      <input name="first_name" type="text" placeholder="Nome (facoltativo)" autocomplete="given-name">
-      <input name="email_address" type="email" placeholder="La tua email" required autocomplete="email">
-      <button class="btn" type="submit"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Iscriviti</button>
-      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic.</small>
-    </form>
-    <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
-  </div>
-</div>
+
   </section>
 
   <section class="view" id="v-best-albums">
@@ -282,14 +287,6 @@
     </div>
     <div class="grid" id="a-grid"></div>
 
-    <div class="soon">
-      <div>
-        <div class="eyebrow">In arrivo</div>
-        <h3 style="margin-top:14px">La mia top 10,<br><span style="color:var(--muted)">sempre aggiornata.</span></h3>
-        <p>Una classifica che si aggiorna da sola in base a quanto ascolto davvero ogni album.</p>
-      </div>
-      <span class="btn"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Presto qui</span>
-    </div>
   </section>
   <section class="view" id="v-grazie">
     <div class="phero" style="border:0">
@@ -299,6 +296,23 @@
       <div class="ctas" style="justify-content:flex-start"><a class="btn" href="#" id="g-open"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></i>Ascolta l'ultima playlist</a><a class="btn ghost" href="#caffe-in-cuffia">Tutte le playlist</a></div>
     </div>
   </section>
+  <div id="nl-wrap">
+<div class="nl" data-nl>
+  <div>
+    <div class="eyebrow">Newsletter</div>
+    <h3>Un caffè, ogni lunedì. <span>In cuffia.</span></h3>
+    <p>Ogni lunedì mattina una Caffè in cuffia da ascoltare con il primo caffè della settimana, più gli album nuovi entrati tra i miei preferiti.</p>
+  </div>
+  <div>
+    <form>
+      <input name="first_name" type="text" placeholder="Nome (facoltativo)" autocomplete="given-name">
+      <input name="email_address" type="email" placeholder="La tua email" required autocomplete="email">
+      <button class="btn" type="submit"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Iscriviti</button>
+      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic.</small>
+    </form>
+    <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
+  </div>
+  </div>
 </main>
 
 <div class="scrim" id="scrim"></div>
@@ -310,7 +324,7 @@
   <div class="p-foot"><a class="btn" id="p-open" href="#" target="_blank" rel="noopener"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Apri su Spotify</a></div>
 </aside>
 
-<footer><div class="wrap"><span>© 2026 Estefania Zappatore</span><span>Musica via Spotify</span></div></footer>
+<footer><div class="wrap"><span>© 2026 Estefania Zappatore · Caffè in Cuffia™</span><span class="disc">Progetto personale, non affiliato né sponsorizzato da Spotify. Brani e copertine appartengono ai rispettivi artisti ed etichette.</span></div></footer>
 
 <script>
 /* =========================================================
@@ -331,7 +345,8 @@ function sampleData(){
   for(let i=0;i<18;i++){const n=318-i;
     playlists.push({title:`Caffè in cuffia #${n}`,num:n,date:`2026-${String(10-Math.floor(i/2)).padStart(2,"0")}-01`,tracks:tr(12+Math.floor(rnd(i+90)*14),i+50),img:null,
       pals:[PALETTE[i%12],PALETTE[(i+3)%12],PALETTE[(i+6)%12],PALETTE[(i+9)%12]],id:null,url:"https://open.spotify.com"});}
-  return {sample:true,albums,playlists};
+  const top=Array.from({length:10},(_,i)=>({t:T[(i*5)%T.length],a:AR[i%AR.length],img:null,id:null,url:"https://open.spotify.com"}));
+  return {sample:true,albums,playlists,top};
 }
 
 let DATA, albums=[], playlists=[];
@@ -430,6 +445,33 @@ document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]
 scrim.addEventListener("click",closePanel);document.getElementById("p-close").addEventListener("click",closePanel);
 addEventListener("keydown",e=>{if(e.key==="Escape")closePanel()});
 
+/* ---------- Top 10 e "in cuffia adesso" ---------- */
+function openTrack(t){
+  document.getElementById("p-cover").innerHTML=t.img?`<img class="art" src="${t.img}" alt="">`:"";
+  document.getElementById("p-title").textContent=t.t;document.getElementById("p-by").textContent=t.a;
+  document.getElementById("p-sub").textContent="";
+  document.getElementById("p-player").innerHTML=t.id?`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`:"";
+  document.getElementById("p-list").innerHTML="";document.getElementById("p-open").href=t.url;
+  panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
+}
+function fillTop(){
+  const top=DATA.top||[];if(!top.length)return;
+  document.getElementById("top10").style.display="";
+  document.getElementById("top10-list").innerHTML=top.map((t,i)=>`<li><a href="#" data-top="${i}"><span class="rk">${i+1}</span>${t.img?`<img src="${t.img}" alt="" loading="lazy">`:`<span class="ph" style="${grad(PALETTE[i%12])}"></span>`}<span style="min-width:0"><b>${esc(t.t)}</b><small>${esc(t.a)}</small></span><span class="pl"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></a></li>`).join("");
+}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-top]");if(a){e.preventDefault();openTrack(DATA.top[+a.dataset.top])}});
+const fa=iso=>{const m=Math.round((Date.now()-new Date(iso))/60000);return m<60?`${m} min fa`:m<1440?`${Math.round(m/60)} ore fa`:`${Math.round(m/1440)} giorni fa`};
+async function nowPlaying(){
+  if(document.hidden)return;
+  try{const r=await fetch("/api/now",{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json();if(!j.track)throw 0;
+    const bar=document.getElementById("now");bar.classList.add("on");bar.classList.toggle("idle",!j.playing);
+    document.getElementById("now-lbl").textContent=j.playing?"In cuffia adesso":`Ascoltato ${fa(j.track.played_at)}`;
+    document.getElementById("now-t").textContent=j.track.t;document.getElementById("now-ar").textContent=j.track.a;
+    const im=document.getElementById("now-img");im.src=j.track.img||"";im.style.display=j.track.img?"":"none";
+    document.getElementById("now-a").onclick=e=>{e.preventDefault();openTrack(j.track)};
+  }catch(e){}
+}
+
 /* ---------- Newsletter (Kit) ---------- */
 const KIT_FORM="10116335";
 document.querySelectorAll("[data-nl] form").forEach(f=>f.addEventListener("submit",async e=>{
@@ -456,7 +498,8 @@ function route(){
   if(v==="best-albums")renderA(); else if(v==="caffe-in-cuffia")renderC();
   if(v==="grazie"&&playlists.length){const last=[...playlists].sort((a,b)=>(b.num||0)-(a.num||0))[0];
     document.getElementById("g-open").onclick=e=>{e.preventDefault();openPanel("c",playlists.indexOf(last))};}
-  if(v!=="grazie")closePanel();window.scrollTo(0,0);
+  if(v!=="grazie")closePanel();
+  document.getElementById("nl-wrap").style.display=v==="grazie"?"none":"";window.scrollTo(0,0);
 }
 addEventListener("hashchange",route);
 addEventListener("scroll",()=>document.getElementById("top").classList.toggle("scrolled",scrollY>10),{passive:true});
@@ -472,7 +515,8 @@ addEventListener("scroll",()=>document.getElementById("top").classList.toggle("s
     document.querySelectorAll('a[href^="#"]').forEach(a=>{const h=a.getAttribute("href");if(P[h]){a.setAttribute("href",P[h]);a.addEventListener("click",e=>{e.preventDefault();history.pushState(null,"",P[h]);route();})}});
     addEventListener("popstate",route);
   }
-  fillIntro();route();
+  fillIntro();fillTop();route();
+  if(!DATA.sample){nowPlaying();setInterval(nowPlaying,60000);document.addEventListener("visibilitychange",nowPlaying);}
 })();
 </script>
 </body>
