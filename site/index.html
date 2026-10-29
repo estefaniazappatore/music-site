@@ -516,7 +516,7 @@ addEventListener("scroll",()=>document.getElementById("top").classList.toggle("s
     addEventListener("popstate",route);
   }
   fillIntro();fillTop();route();
-  if(!DATA.sample){nowPlaying();setInterval(nowPlaying,60000);document.addEventListener("visibilitychange",nowPlaying);}
+  nowPlaying();setInterval(nowPlaying,60000);document.addEventListener("visibilitychange",nowPlaying);
 })();
 </script>
 </body>
