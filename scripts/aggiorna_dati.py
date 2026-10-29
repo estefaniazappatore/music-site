@@ -58,6 +58,7 @@ def client():
 
 
 def chiama(fn, *args, **kw):
+    __import__("time").sleep(0.4)
     try:
         return fn(*args, **kw)
     except SpotifyException as e:
