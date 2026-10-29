@@ -146,6 +146,7 @@ def classifica(p, brani):
         "id": alb["id"], "playlist": p["id"], "year": anno,
         "title": alb["name"], "artist": alb["artist"], "date": alb["date"],
         "img": alb["img"], "url": alb["url"], "tracks": tracce,
+        "aggiunto": aggiunte[0] if aggiunte else None,
     }
 
 

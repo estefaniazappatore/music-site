@@ -137,6 +137,20 @@
   .p-list li span{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
   .p-foot{padding:14px 18px 18px;border-top:1px solid var(--line)}
   .p-foot .btn{width:100%;justify-content:center}
+  /* Newsletter */
+  .nl{margin:0 0 120px;border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(28px,4vw,56px);display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;
+    background:radial-gradient(70% 120% at 100% 100%,rgba(240,139,200,.16),transparent 60%),radial-gradient(60% 100% at 85% 0%,rgba(134,169,224,.14),transparent 60%),var(--surface)}
+  .nl h3{font-family:var(--title);font-weight:500;font-size:clamp(28px,3.2vw,44px);letter-spacing:-.04em;line-height:1.02;margin-top:14px}
+  .nl h3 span{color:var(--muted)}
+  .nl p{color:var(--muted);margin-top:12px;max-width:440px}
+  .nl form{display:flex;flex-direction:column;gap:10px}
+  .nl input{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:15px 18px;color:var(--text);font:inherit;font-size:15px;outline:none;transition:border-color .25s}
+  .nl input:focus{border-color:rgba(230,229,215,.35)}
+  .nl .btn{justify-content:center;border:0;cursor:pointer;font:inherit;font-weight:500}
+  .nl small{color:var(--muted);font-size:12px;line-height:1.5}
+  .nl .ok{display:none;font-family:var(--title);font-size:22px;letter-spacing:-.02em}
+  .nl.done form{display:none}.nl.done .ok{display:block}
+  @media (max-width:800px){.nl{grid-template-columns:1fr}}
   .badge{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--surface-2);background:var(--surface);border-radius:var(--r-pill);padding:4px 14px 4px 4px;font-size:14px;color:var(--soft)}
   .badge b{background:var(--text);color:var(--bg);font-weight:500;font-size:12px;padding:3px 10px;border-radius:var(--r-pill)}
   .btn{display:inline-flex;align-items:center;gap:12px;background:var(--text);color:var(--bg);border-radius:16px;padding:10px 22px 10px 10px;font-weight:500;font-size:15px}
@@ -194,6 +208,22 @@
         <span class="go-big"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
       </a>
     </div>
+<div class="nl" style="margin-top:-60px" data-nl>
+  <div>
+    <div class="eyebrow">Newsletter</div>
+    <h3>Un caffè, ogni lunedì. <span>In cuffia.</span></h3>
+    <p>Ogni lunedì mattina una Caffè in cuffia da ascoltare con il primo caffè della settimana, più gli album nuovi entrati tra i miei preferiti.</p>
+  </div>
+  <div>
+    <form>
+      <input name="first_name" type="text" placeholder="Nome (facoltativo)" autocomplete="given-name">
+      <input name="email_address" type="email" placeholder="La tua email" required autocomplete="email">
+      <button class="btn" type="submit"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Iscriviti</button>
+      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic.</small>
+    </form>
+    <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
+  </div>
+</div>
   </section>
 
   <section class="view" id="v-caffe-in-cuffia">
@@ -212,6 +242,23 @@
       <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="c-q" placeholder="Cerca una playlist"></label>
     </div>
     <div class="grid" id="c-grid"></div>
+    <div style="height:80px"></div>
+<div class="nl" data-nl>
+  <div>
+    <div class="eyebrow">Newsletter</div>
+    <h3>Un caffè, ogni lunedì. <span>In cuffia.</span></h3>
+    <p>Ogni lunedì mattina una Caffè in cuffia da ascoltare con il primo caffè della settimana, più gli album nuovi entrati tra i miei preferiti.</p>
+  </div>
+  <div>
+    <form>
+      <input name="first_name" type="text" placeholder="Nome (facoltativo)" autocomplete="given-name">
+      <input name="email_address" type="email" placeholder="La tua email" required autocomplete="email">
+      <button class="btn" type="submit"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Iscriviti</button>
+      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic.</small>
+    </form>
+    <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
+  </div>
+</div>
   </section>
 
   <section class="view" id="v-best-albums">
@@ -242,6 +289,14 @@
         <p>Una classifica che si aggiorna da sola in base a quanto ascolto davvero ogni album.</p>
       </div>
       <span class="btn"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Presto qui</span>
+    </div>
+  </section>
+  <section class="view" id="v-grazie">
+    <div class="phero" style="border:0">
+      <div class="eyebrow">Iscrizione confermata</div>
+      <h1>Grazie, <em>a lunedì.</em></h1>
+      <p class="lead">Da lunedì ti arriva una Caffè in cuffia a settimana. Intanto, questa è l'ultima uscita: buon ascolto.</p>
+      <div class="ctas" style="justify-content:flex-start"><a class="btn" href="#" id="g-open"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></i>Ascolta l'ultima playlist</a><a class="btn ghost" href="#caffe-in-cuffia">Tutte le playlist</a></div>
     </div>
   </section>
 </main>
@@ -371,8 +426,21 @@ document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]
 scrim.addEventListener("click",closePanel);document.getElementById("p-close").addEventListener("click",closePanel);
 addEventListener("keydown",e=>{if(e.key==="Escape")closePanel()});
 
+/* ---------- Newsletter (Kit) ---------- */
+const KIT_FORM="10116335";
+document.querySelectorAll("[data-nl] form").forEach(f=>f.addEventListener("submit",async e=>{
+  e.preventDefault();const box=f.closest("[data-nl]"),b=f.querySelector("button");b.disabled=true;
+  try{
+    const fd=new FormData(f);const body=new FormData();
+    body.append("email_address",fd.get("email_address"));
+    if(fd.get("first_name"))body.append("fields[first_name]",fd.get("first_name"));
+    const r=await fetch(`https://app.kit.com/forms/${KIT_FORM}/subscriptions`,{method:"POST",body,headers:{Accept:"application/json"}});
+    if(!r.ok)throw 0; box.classList.add("done");
+  }catch(err){b.disabled=false;f.querySelector("small").textContent="Qualcosa non ha funzionato. Riprova tra poco.";}
+}));
+
 /* ---------- Navigazione: /caffeincuffia e /best-albums sul sito, #hash in anteprima ---------- */
-const ROUTES={"caffeincuffia":"caffe-in-cuffia","caffe-in-cuffia":"caffe-in-cuffia","best-albums":"best-albums"};
+const ROUTES={"caffeincuffia":"caffe-in-cuffia","caffe-in-cuffia":"caffe-in-cuffia","best-albums":"best-albums","grazie":"grazie"};
 function currentView(){
   const p=location.pathname.replace(/\/+$/,"").split("/").pop();
   return ROUTES[location.hash.slice(1)]||ROUTES[p]||"home";
@@ -382,7 +450,9 @@ function route(){
   document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
   document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("active",a.dataset.v===v));
   if(v==="best-albums")renderA(); else if(v==="caffe-in-cuffia")renderC();
-  closePanel();window.scrollTo(0,0);
+  if(v==="grazie"&&playlists.length){const last=[...playlists].sort((a,b)=>(b.num||0)-(a.num||0))[0];
+    document.getElementById("g-open").onclick=e=>{e.preventDefault();openPanel("c",playlists.indexOf(last))};}
+  if(v!=="grazie")closePanel();window.scrollTo(0,0);
 }
 addEventListener("hashchange",route);
 addEventListener("scroll",()=>document.getElementById("top").classList.toggle("scrolled",scrollY>10),{passive:true});
@@ -394,7 +464,7 @@ addEventListener("scroll",()=>document.getElementById("top").classList.toggle("s
   albums.forEach((a,i)=>a.pal=a.pal||PALETTE[i%12]);
   playlists.forEach((p,i)=>p.pals=p.pals||[PALETTE[i%12],PALETTE[(i+3)%12],PALETTE[(i+6)%12],PALETTE[(i+9)%12]]);
   if(!DATA.sample){ /* sito vero: indirizzi puliti /caffeincuffia e /best-albums */
-    const P={"#home":"/","#caffe-in-cuffia":"/caffeincuffia","#best-albums":"/best-albums"};
+    const P={"#home":"/","#caffe-in-cuffia":"/caffeincuffia","#best-albums":"/best-albums","#grazie":"/grazie"};
     document.querySelectorAll('a[href^="#"]').forEach(a=>{const h=a.getAttribute("href");if(P[h]){a.setAttribute("href",P[h]);a.addEventListener("click",e=>{e.preventDefault();history.pushState(null,"",P[h]);route();})}});
     addEventListener("popstate",route);
   }
