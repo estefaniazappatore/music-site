@@ -58,7 +58,7 @@ def client():
 
 
 def chiama(fn, *args, **kw):
-    __import__("time").sleep(0.4)
+    __import__("time").sleep(CONFIG.get("pausa_secondi", 1.0))
     try:
         return fn(*args, **kw)
     except SpotifyException as e:
@@ -158,8 +158,18 @@ def main():
     viste = set()
     try:
         me = chiama(sp.current_user)["id"]
-        for p in mie_playlist(sp, me):
-            viste.add(p["id"])
+        tutte = list(mie_playlist(sp, me))
+        viste = {p["id"] for p in tutte}
+
+        def priorita(p):
+            # prima le Caffè in cuffia dalla più recente (numero più alto), poi il resto nell'ordine della libreria
+            if re.search(CONFIG["caffe_pattern"], p["name"], re.I):
+                n = re.search(r"(\d+)", p["name"])
+                return (0, -(int(n.group(1)) if n else 0))
+            return (1, 0)
+
+        limite = CONFIG.get("max_letture_per_esecuzione", 200)
+        for p in sorted(tutte, key=priorita):
             vecchia = cache.get(p["id"])
             if vecchia and vecchia.get("snapshot") == p["snapshot_id"]:
                 continue
@@ -168,6 +178,10 @@ def main():
             if not e_caffe and not (2 <= totale <= CONFIG["max_brani_album"]):
                 cache[p["id"]] = {"snapshot": p["snapshot_id"], "tipo": None}
                 continue
+            if lette >= limite:
+                parziale = True
+                print(f"Raggiunte {limite} letture: il resto alla prossima esecuzione.")
+                break
             brani = leggi_brani(sp, p["id"])
             tipo, voce = classifica(p, brani)
             cache[p["id"]] = {"snapshot": p["snapshot_id"], "tipo": tipo, "voce": voce}
@@ -175,9 +189,10 @@ def main():
             if lette % 25 == 0:
                 CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
         # playlist cancellate da Spotify: via anche dal sito
-        for pid in list(cache):
-            if pid not in viste:
-                del cache[pid]
+        if not parziale:
+            for pid in list(cache):
+                if pid not in viste:
+                    del cache[pid]
     except LimiteRaggiunto:
         parziale = True
         print("Limite di Spotify raggiunto: salvo i progressi e riprendo alla prossima esecuzione.")
