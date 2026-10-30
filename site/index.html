@@ -231,6 +231,7 @@
     .art.ph{font-size:20px;padding:12px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}.card{opacity:1;transform:none}}
+.nl small a{color:inherit;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -337,9 +338,10 @@
       <input name="first_name" type="text" placeholder="Nome" autocomplete="given-name">
       <input name="email_address" type="email" placeholder="La tua email" required autocomplete="email">
       <button class="btn" type="submit"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Iscriviti</button>
-      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic.</small>
+      <small>Ti arriva un'email per confermare l'iscrizione. Niente spam, ti cancelli quando vuoi con un clic. Leggi l'<a href="#privacy">informativa privacy</a>.</small>
     </form>
     <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
+  </div>
   </div>
   </div>
   <section class="view" id="v-privacy">
@@ -596,7 +598,7 @@ function route(){
   if(v==="grazie"&&playlists.length){const last=[...playlists].sort((a,b)=>(b.num||0)-(a.num||0))[0];
     document.getElementById("g-open").onclick=e=>{e.preventDefault();openPanel("c",playlists.indexOf(last))};}
   if(v!=="grazie")closePanel();
-  document.getElementById("nl-wrap").style.display=v==="grazie"?"none":"";window.scrollTo(0,0);
+  document.getElementById("nl-wrap").style.display=(v==="grazie"||v==="privacy")?"none":"";window.scrollTo(0,0);
 }
 addEventListener("hashchange",route);
 addEventListener("scroll",()=>document.getElementById("top").classList.toggle("scrolled",scrollY>10),{passive:true});
