@@ -1,0 +1,16 @@
+{
+  "caffe_pattern": "caff[eè] in cuffia",
+  "anni_best_albums": [
+    "2025",
+    "2026"
+  ],
+  "anno_da": "uscita",
+  "soglia_stesso_album": 0.8,
+  "max_brani_album": 60,
+  "escludi": [],
+  "forza_anno": {},
+  "carica_copertine_su_spotify": false,
+  "copertine_per_notte": 40,
+  "max_letture_per_esecuzione": 200,
+  "pausa_secondi": 1.0
+}
