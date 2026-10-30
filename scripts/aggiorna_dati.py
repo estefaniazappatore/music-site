@@ -90,6 +90,7 @@ def leggi_brani(sp, pid):
             alb = t.get("album") or {}
             imgs = alb.get("images") or []
             brani.append({
+                "id": t.get("id"),
                 "t": t.get("name", ""),
                 "a": ", ".join(a["name"] for a in t.get("artists", [])),
                 "ms": t.get("duration_ms", 0),
@@ -112,7 +113,7 @@ def classifica(p, brani):
     nome = p["name"]
     if p["id"] in CONFIG["escludi"]:
         return None, None
-    tracce = [{"t": b["t"], "a": b["a"], "ms": b["ms"]} for b in brani]
+    tracce = [{"id": b.get("id"), "t": b["t"], "a": b["a"], "ms": b["ms"]} for b in brani]
     aggiunte = sorted(b["added"] for b in brani if b["added"])
 
     if re.search(CONFIG["caffe_pattern"], nome, re.I):
@@ -168,10 +169,20 @@ def main():
                 return (1, -(int(n.group(1)) if n else 0))
             return (0, 0)
 
+        def senza_id(v):
+            # voci lette prima che salvassimo l'ID dei brani: da rileggere, con calma
+            voce = (v or {}).get("voce") or {}
+            return bool(voce.get("tracks")) and "id" not in voce["tracks"][0]
+
+        def da_fare(p):
+            v = cache.get(p["id"])
+            if not v or v.get("snapshot") != p["snapshot_id"]:
+                return 0  # nuova o cambiata: prima di tutto
+            return 1 if senza_id(v) else 2
+
         limite = CONFIG.get("max_letture_per_esecuzione", 200)
-        for p in sorted(tutte, key=priorita):
-            vecchia = cache.get(p["id"])
-            if vecchia and vecchia.get("snapshot") == p["snapshot_id"]:
+        for p in sorted(tutte, key=lambda p: (da_fare(p), priorita(p))):
+            if da_fare(p) == 2:
                 continue
             totale = (p.get("items") or p.get("tracks") or {}).get("total", 0)
             e_caffe = re.search(CONFIG["caffe_pattern"], p["name"], re.I)
