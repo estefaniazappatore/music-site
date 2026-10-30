@@ -423,8 +423,8 @@ function fillIntro(){
   document.getElementById("door-a-n").textContent=`${n26} album del 2026 · ${n25} del 2025`;
   const tileA=a=>a.img?`<div><img src="${a.img}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:`<div style="${grad(a.pal)}"></div>`;
   const tileP=p=>p.img?`<div><img src="${p.img}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>`:`<div style="${grad(p.pals[0])}"></div>`;
-  document.getElementById("door-c").innerHTML=[...playlists].sort((a,b)=>(b.num||0)-(a.num||0)).slice(0,8).map(tileP).join("");
-  document.getElementById("door-a").innerHTML=albums.filter(a=>a.year==="2026").sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,8).map(tileA).join("");
+  document.getElementById("door-c").innerHTML='<div style="grid-column:1/-1;grid-row:1/-1"><img src="/home-caffe.jpg" alt="Caffè in cuffia" style="width:100%;height:100%;object-fit:cover;display:block"></div>';
+  document.getElementById("door-a").innerHTML='<div style="grid-column:1/-1;grid-row:1/-1"><img src="/home-album.jpg" alt="Best Albums" style="width:100%;height:100%;object-fit:cover;display:block"></div>';
   if(!DATA.sample){const pv=document.querySelector(".preview");if(pv)pv.remove();}
 }
 
