@@ -8,9 +8,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#111013">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/fonts.css">
 <style>
   :root{
     --bg:#111013; --surface:#17161a; --surface-2:#1e1d22; --line:rgba(230,229,215,.09);
@@ -194,6 +192,21 @@
   .mini iframe{display:block;width:100%;height:80px;border:0;border-radius:12px}
   .mini .x{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:var(--surface);color:var(--soft);display:grid;place-items:center}
   .mini .x:hover{color:var(--text)}
+  /* Consenso cookie */
+  .cc{position:fixed;left:16px;bottom:16px;z-index:60;width:min(420px,calc(100vw - 32px));background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.5);display:none;font-size:14px;color:var(--soft);line-height:1.5}
+  .cc.on{display:block}
+  .cc b{display:block;font-family:var(--title);font-weight:600;font-size:17px;color:var(--text);margin-bottom:6px}
+  .cc a{color:var(--text);text-decoration:underline}
+  .cc .row{display:flex;gap:8px;margin-top:14px}
+  .cc button{flex:1;padding:11px 14px;border-radius:12px;font-weight:500;font-size:14px}
+  .cc .ok{background:var(--text);color:var(--bg)}.cc .no{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+  .gate{padding:22px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;color:var(--soft);font-size:14px;line-height:1.5;text-align:left}
+  .gate button{background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:500;font-size:14px}
+  footer a{color:var(--soft);text-decoration:underline}
+  .legal{max-width:760px;padding-bottom:100px}
+  .legal h2{font-family:var(--title);font-weight:600;font-size:22px;letter-spacing:-.02em;margin:36px 0 10px;color:var(--text)}
+  .legal p,.legal li{color:var(--soft);margin-bottom:10px}.legal ul{margin:0 0 10px 20px}
+  .legal a{color:var(--text);text-decoration:underline}
   .badge{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--surface-2);background:var(--surface);border-radius:var(--r-pill);padding:4px 14px 4px 4px;font-size:14px;color:var(--soft)}
   .badge b{background:var(--text);color:var(--bg);font-weight:500;font-size:12px;padding:3px 10px;border-radius:var(--r-pill)}
   .btn{display:inline-flex;align-items:center;gap:12px;background:var(--text);color:var(--bg);border-radius:16px;padding:10px 22px 10px 10px;font-weight:500;font-size:15px}
@@ -329,6 +342,38 @@
     <div class="ok">Quasi fatto: controlla la tua email e conferma l'iscrizione.</div>
   </div>
   </div>
+  <section class="view" id="v-privacy">
+    <div class="phero" style="border:0;margin-bottom:0">
+      <div class="eyebrow">Informativa</div>
+      <h1>Privacy <em>e cookie.</em></h1>
+      <p class="lead">Come questo sito tratta i tuoi dati, in parole semplici. Ultimo aggiornamento: ottobre 2026.</p>
+    </div>
+    <div class="legal">
+      <h2>Chi è il titolare</h2>
+      <p>Estefania Zappatore, Bologna. Per qualsiasi richiesta sui tuoi dati scrivi a <a href="mailto:privacy@estefaniazappatore.it">privacy@estefaniazappatore.it</a>.</p>
+      <h2>Quali dati raccolgo e perché</h2>
+      <ul>
+        <li><b>Newsletter.</b> Se ti iscrivi raccolgo la tua email e, se lo indichi, il tuo nome, solo per mandarti la newsletter Caffè in Cuffia. La base giuridica è il tuo consenso, che confermi con la doppia verifica via email. Puoi cancellarti quando vuoi con il link in fondo a ogni email.</li>
+        <li><b>Navigazione.</b> Il sito non usa strumenti di statistica né di profilazione. Il fornitore di hosting registra dati tecnici (come l'indirizzo IP) per far funzionare il servizio e proteggerlo da abusi.</li>
+      </ul>
+      <h2>A chi affido i dati</h2>
+      <ul>
+        <li><b>Kit</b> (Kit.com, Stati Uniti), che gestisce l'invio della newsletter.</li>
+        <li><b>Cloudflare</b> (Stati Uniti), che ospita il sito.</li>
+      </ul>
+      <p>Questi fornitori trattano i dati per mio conto. Il trasferimento verso gli Stati Uniti avviene con le garanzie previste dal GDPR (clausole contrattuali standard o adesione al Data Privacy Framework).</p>
+      <h2>Per quanto tempo</h2>
+      <p>I dati della newsletter restano finché sei iscrittə. Quando ti cancelli smetto di usarli e li elimino.</p>
+      <h2>Cookie</h2>
+      <ul>
+        <li><b>Cookie tecnici:</b> il sito ricorda solo la tua scelta sui cookie, nel tuo browser. Non serve il consenso.</li>
+        <li><b>Player di Spotify:</b> i player per ascoltare la musica sono forniti da Spotify, che usa i propri cookie anche per riconoscere il tuo account. Si caricano <b>solo se dai il consenso</b>. Se rifiuti, puoi comunque aprire ogni brano e playlist su Spotify. <a href="https://www.spotify.com/it/legal/cookies-policy/" target="_blank" rel="noopener">Cookie policy di Spotify</a>.</li>
+      </ul>
+      <p>Puoi cambiare idea quando vuoi: <a href="#" id="cc-reopen">modifica le preferenze sui cookie</a>.</p>
+      <h2>I tuoi diritti</h2>
+      <p>Puoi chiedere di accedere ai tuoi dati, correggerli, cancellarli, limitarne l'uso, opporti al trattamento e riceverli in formato portabile, scrivendo all'indirizzo sopra. Se pensi che i tuoi dati siano trattati in modo non corretto puoi rivolgerti al <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Garante per la protezione dei dati personali</a>.</p>
+    </div>
+  </section>
 </main>
 
 <div class="scrim" id="scrim"></div>
@@ -341,8 +386,8 @@
 </aside>
 
 <div class="mini" id="mini" aria-hidden="true"><div id="mini-embed"></div><button class="x" id="mini-x" aria-label="Chiudi player"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
-<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
-<footer><div class="wrap"><span>© 2026 Estefania Zappatore · Caffè in Cuffia™</span><span class="disc">Progetto personale, non affiliato né sponsorizzato da Spotify. Brani e copertine appartengono ai rispettivi artisti ed etichette.</span></div></footer>
+<div class="cc" id="cc" role="dialog" aria-label="Preferenze cookie"><b>Un caffè e due cookie</b>Il sito usa solo cookie tecnici. I player per ascoltare la musica sono di Spotify e usano i suoi cookie: li carico solo se sei d'accordo. <a href="#privacy">Privacy e cookie</a><div class="row"><button class="no" id="cc-no">Solo tecnici</button><button class="ok" id="cc-ok">Accetta Spotify</button></div></div>
+<footer><div class="wrap"><span>© 2026 Estefania Zappatore · Caffè in Cuffia™ · <a href="#privacy">Privacy e cookie</a></span><span class="disc">Progetto personale, non affiliato né sponsorizzato da Spotify. Brani e copertine appartengono ai rispettivi artisti ed etichette.</span></div></footer>
 
 <script>
 /* =========================================================
@@ -443,14 +488,14 @@ function fillIntro(){
 
 /* ---------- Pannello dettaglio con tracklist e player ---------- */
 const panel=document.getElementById("panel"),scrim=document.getElementById("scrim");
-function openPanel(kind,i){
+function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);
   const it=kind==="a"?albums[i]:playlists[i];
   document.getElementById("p-cover").innerHTML=kind==="a"?artAlbum(it):artPlaylist(it);
   document.getElementById("p-title").textContent=it.title;
   document.getElementById("p-by").textContent=kind==="a"?it.artist:"Playlist di Estefania";
   document.getElementById("p-sub").textContent=kind==="a"?`${fmt(it.date)} · ${it.tracks.length} brani`:`${it.tracks.length} brani · ${mins(it.tracks)} min`;
   const pl=document.getElementById("p-player");
-  pl.innerHTML=it.id
+  pl.innerHTML=it.id&&!spotifyOk()?gateHTML(it.url):it.id
     ?`<iframe src="https://open.spotify.com/embed/${kind==="a"?"album":"playlist"}/${it.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`
     :`<div class="ph-player"><span class="ph-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><div><b style="color:var(--text);font-weight:500">Qui c'è il player di Spotify</b><br>Sul sito pubblicato si ascolta direttamente da questa scheda.</div></div>`;
   document.getElementById("p-list").innerHTML=it.tracks.map(x=>`<li><div><b>${esc(x.t)}</b><small>${esc(x.a)}</small></div><span>${dur(x.ms)}</span></li>`).join("");
@@ -463,12 +508,27 @@ document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]
 scrim.addEventListener("click",closePanel);document.getElementById("p-close").addEventListener("click",closePanel);
 addEventListener("keydown",e=>{if(e.key==="Escape")closePanel()});
 
+/* ---------- Consenso cookie (player Spotify) ---------- */
+let CONSENSO=null;try{CONSENSO=localStorage.getItem("cc-spotify")}catch(e){}
+const spotifyOk=()=>CONSENSO==="si";
+function caricaApiSpotify(){if(document.getElementById("sp-api"))return;const sc=document.createElement("script");sc.id="sp-api";sc.src="https://open.spotify.com/embed/iframe-api/v1";sc.async=true;document.body.appendChild(sc);}
+function salvaConsenso(v){CONSENSO=v;try{localStorage.setItem("cc-spotify",v)}catch(e){}document.getElementById("cc").classList.remove("on");if(v==="si")caricaApiSpotify();}
+document.getElementById("cc-ok").addEventListener("click",()=>salvaConsenso("si"));
+document.getElementById("cc-no").addEventListener("click",()=>salvaConsenso("no"));
+document.addEventListener("click",e=>{if(e.target.id==="cc-reopen"){e.preventDefault();document.getElementById("cc").classList.add("on")}});
+if(!CONSENSO)document.getElementById("cc").classList.add("on");else if(spotifyOk())caricaApiSpotify();
+function gateHTML(url){return `<div class="gate">Il player è fornito da Spotify, che usa i suoi cookie.<button type="button" class="gate-ok">Attiva il player</button><a href="${url}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline">Oppure apri su Spotify</a></div>`}
+
+document.addEventListener("click",e=>{const g=e.target.closest(".gate-ok");if(!g)return;salvaConsenso("si");
+  if(g.closest("#mini")){const t=miniPending;miniPending=null;document.getElementById("mini-embed").innerHTML="";if(t){if(SpotiAPI)playMini(t);else{miniPending=t;}}}
+  else if(window._lastOpen){window._lastOpen()}});
+
 /* ---------- Top 10 e "in cuffia adesso" ---------- */
-function openTrack(t){
+function openTrack(t){window._lastOpen=()=>openTrack(t);
   document.getElementById("p-cover").innerHTML=t.img?`<img class="art" src="${t.img}" alt="">`:"";
   document.getElementById("p-title").textContent=t.t;document.getElementById("p-by").textContent=t.a;
   document.getElementById("p-sub").textContent="";
-  document.getElementById("p-player").innerHTML=t.id?`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`:"";
+  document.getElementById("p-player").innerHTML=t.id&&!spotifyOk()?gateHTML(t.url):t.id?`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`:"";
   document.getElementById("p-list").innerHTML="";document.getElementById("p-open").href=t.url;
   panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
 }
@@ -483,6 +543,7 @@ window.onSpotifyIframeApiReady=api=>{SpotiAPI=api;if(miniPending){playMini(miniP
 function playMini(t){
   const box=document.getElementById("mini");box.classList.add("on");box.setAttribute("aria-hidden","false");
   const uri="spotify:track:"+t.id;
+  if(!spotifyOk()){document.getElementById("mini-embed").innerHTML=gateHTML(t.url);miniPending=t;return;}
   if(!SpotiAPI){ // API non ancora caricata: ripiego sul player normale
     document.getElementById("mini-embed").innerHTML=`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;return;}
   if(miniCtrl){miniCtrl.loadUri(uri);miniCtrl.play();return;}
@@ -522,7 +583,7 @@ document.querySelectorAll("[data-nl] form").forEach(f=>f.addEventListener("submi
 }));
 
 /* ---------- Navigazione: /caffeincuffia e /best-albums sul sito, #hash in anteprima ---------- */
-const ROUTES={"caffeincuffia":"caffe-in-cuffia","caffe-in-cuffia":"caffe-in-cuffia","best-albums":"best-albums","grazie":"grazie"};
+const ROUTES={"caffeincuffia":"caffe-in-cuffia","caffe-in-cuffia":"caffe-in-cuffia","best-albums":"best-albums","grazie":"grazie","privacy":"privacy"};
 function currentView(){
   const p=location.pathname.replace(/\/+$/,"").split("/").pop();
   return ROUTES[location.hash.slice(1)]||ROUTES[p]||"home";
@@ -547,7 +608,7 @@ addEventListener("scroll",()=>document.getElementById("top").classList.toggle("s
   albums.forEach((a,i)=>a.pal=a.pal||PALETTE[i%12]);
   playlists.forEach((p,i)=>p.pals=p.pals||[PALETTE[i%12],PALETTE[(i+3)%12],PALETTE[(i+6)%12],PALETTE[(i+9)%12]]);
   if(!DATA.sample){ /* sito vero: indirizzi puliti /caffeincuffia e /best-albums */
-    const P={"#home":"/","#caffe-in-cuffia":"/caffeincuffia","#best-albums":"/best-albums","#grazie":"/grazie"};
+    const P={"#home":"/","#caffe-in-cuffia":"/caffeincuffia","#best-albums":"/best-albums","#grazie":"/grazie","#privacy":"/privacy"};
     document.querySelectorAll('a[href^="#"]').forEach(a=>{const h=a.getAttribute("href");if(P[h]){a.setAttribute("href",P[h]);a.addEventListener("click",e=>{e.preventDefault();history.pushState(null,"",P[h]);route();})}});
     addEventListener("popstate",route);
   }
