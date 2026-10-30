@@ -10,5 +10,7 @@
   "escludi": [],
   "forza_anno": {},
   "carica_copertine_su_spotify": false,
-  "copertine_per_notte": 40
+  "copertine_per_notte": 40,
+  "max_letture_per_esecuzione": 100,
+  "pausa_secondi": 1.0
 }
