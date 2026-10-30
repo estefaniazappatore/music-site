@@ -165,8 +165,8 @@ def main():
             # prima le Caffè in cuffia dalla più recente (numero più alto), poi il resto nell'ordine della libreria
             if re.search(CONFIG["caffe_pattern"], p["name"], re.I):
                 n = re.search(r"(\d+)", p["name"])
-                return (0, -(int(n.group(1)) if n else 0))
-            return (1, 0)
+                return (1, -(int(n.group(1)) if n else 0))
+            return (0, 0)
 
         limite = CONFIG.get("max_letture_per_esecuzione", 200)
         for p in sorted(tutte, key=priorita):
