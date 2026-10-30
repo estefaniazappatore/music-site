@@ -4,7 +4,7 @@ Newsletter Caffè in cuffia.
 
 Ogni domenica:
   1. sceglie la prossima playlist (si parte da 10 prima dell'ultima e si va avanti di una);
-  2. compone l'email (copertina, testo, tracklist, uscite della settimana);
+  2. compone l'email (copertina, testo, uscite della settimana);
   3. la manda subito come ANTEPRIMA a chi ha l'etichetta "anteprima" su Kit;
   4. programma l'invio vero a tutti per lunedì alle 7:30 (ora italiana).
 
@@ -13,7 +13,9 @@ Uso:
   python scripts/newsletter.py --prova      -> solo anteprima, non programma e non avanza
   python scripts/newsletter.py --html x.html -> scrive l'email in un file, senza Kit
 
-Testi: scripts/testi/caffe/<numero>.md e scripts/testi/album/<id_album>.md
+Testi: scripts/testi/caffe/<numero>.md contiene solo gli stili musicali
+(es. "dal neo soul al jazz elettronico, passando per il lo-fi");
+scripts/testi/album/<id_album>.md contiene due righe sull'album.
 Se un testo manca, l'email parte con una riga automatica e l'anteprima lo segnala.
 """
 import html
@@ -91,21 +93,17 @@ def paragrafi(testo):
 
 def componi(p, uscite):
     mancanti = []
-    testo = leggi_testo("caffe", p["num"])
-    if not testo:
-        mancanti.append(f"Caffè in cuffia #{p['num']}")
-        art = artisti_principali(p["tracks"])
-        testo = (f"{len(p['tracks'])} brani per il caffè di questa settimana, "
-                 f"con {', '.join(art[:-1])} e {art[-1]}." if len(art) > 1 else
-                 f"{len(p['tracks'])} brani per il caffè di questa settimana.")
+    art = artisti_principali(p["tracks"], 4)
+    elenco = art[0] if len(art) == 1 else ", ".join(art[:-1]) + " e " + art[-1]
+    testo = f"La playlist di questa settimana contiene {len(p['tracks'])} brani di artisti come {elenco}."
+    stili = leggi_testo("caffe", p["num"])  # es: "dal neo soul al jazz elettronico, passando per il lo-fi"
+    if stili:
+        testo += f" Questa playlist spazia {stili.rstrip('.')}."
+    else:
+        mancanti.append(f"Caffè in cuffia #{p['num']} (stili musicali)")
+    testo += " Scommetto che aggiungerai almeno un brano tra i tuoi preferiti!"
     minuti = round(sum(t["ms"] for t in p["tracks"]) / 60000)
     cover = f"{SITO}/covers/{p['num']}.jpg"
-    righe = "".join(
-        f'<tr><td style="padding:7px 0;width:28px;color:#9a99a0;font-size:13px;vertical-align:top">{i}</td>'
-        f'<td style="padding:7px 0;font-size:14px;line-height:1.4;color:#17161a">{e(t["t"])}'
-        f'<br><span style="color:#8a8990;font-size:13px">{e(t["a"])}</span></td></tr>'
-        for i, t in enumerate(p["tracks"], 1))
-
     blocco_uscite = ""
     if uscite:
         voci = ""
@@ -134,23 +132,22 @@ def componi(p, uscite):
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ea;font-family:Inter,Helvetica,Arial,sans-serif">
 <tr><td align="center" style="padding:28px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fbf8f3;border-radius:20px;overflow:hidden">
-<tr><td style="padding:26px 32px 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8a8990">
-<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f08bc8;margin-right:8px"></span>Caffè in cuffia · lunedì</td></tr>
+<tr><td style="padding:26px 32px 0;font-size:14px;color:#6f6e75">
+<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f08bc8;margin-right:8px"></span>Caffè in Cuffia: la playlist per iniziare bene la settimana</td></tr>
 <tr><td style="padding:18px 32px 0">
 <a href="{p['url']}"><img src="{cover}" width="496" alt="Caffè in cuffia #{p['num']}" style="display:block;width:100%;height:auto;border-radius:16px;border:0"></a></td></tr>
 <tr><td style="padding:26px 32px 0;font-family:'DM Sans',Helvetica,Arial,sans-serif">
-<p style="margin:0 0 4px;font-size:15px;color:#3a393f">{{% if subscriber.first_name != blank %}}Ciao {{{{ subscriber.first_name }}}},{{% else %}}Ciao,{{% endif %}}</p>
+<p style="margin:0 0 4px;font-size:15px;color:#3a393f">Ciao{{% if subscriber.first_name != blank %}} {{{{ subscriber.first_name }}}}{{% endif %}},</p>
 <p style="margin:0 0 16px;font-size:30px;line-height:1.1;font-weight:600;letter-spacing:-.03em;color:#17161a">Caffè in cuffia #{p['num']}</p>
 {paragrafi(testo)}
 <p style="margin:0 0 22px;font-size:13px;color:#8a8990">{len(p['tracks'])} brani · {minuti} minuti</p>
 <a href="{p['url']}" style="display:inline-block;background:#17161a;color:#fbf8f3;text-decoration:none;font-weight:500;font-size:15px;padding:14px 26px;border-radius:14px">Ascolta su Spotify</a>
 </td></tr>
-<tr><td style="padding:30px 32px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e7e3da">{righe}</table></td></tr>
 {blocco_uscite}
 <tr><td style="padding:30px 32px 34px;border-top:1px solid #e7e3da">
-<p style="margin:0 0 14px;font-size:15px;color:#3a393f">Le trovi tutte, dalla prima all'ultima, sul sito.</p>
 <a href="{SITO}/caffeincuffia" style="color:#17161a;font-weight:600;font-size:15px;text-decoration:underline">Ascolta tutte le playlist</a>
-<p style="margin:22px 0 0;font-size:15px;color:#3a393f">Buon caffè,<br>Estefania</p>
+<p style="margin:6px 0 0;font-size:15px;color:#3a393f">Le trovi tutte, dalla prima all'ultima, sul sito.</p>
+<p style="margin:22px 0 0;font-size:15px;color:#3a393f">Buon inizio settimana,<br>Estefania</p>
 </td></tr></table></td></tr></table></body></html>"""
     oggetto = f"Caffè in cuffia #{p['num']}"
     if uscite:
