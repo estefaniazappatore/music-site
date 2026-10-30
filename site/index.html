@@ -232,6 +232,29 @@
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}.card{opacity:1;transform:none}}
 .nl small a{color:inherit;text-decoration:underline}
+
+  .p-open{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .p-open:hover{color:var(--text);border-color:var(--soft)}
+  .p-foot{padding:12px 12px 12px;border-top:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:10px}
+  .p-nav{display:flex;justify-content:center;align-items:center;gap:22px}
+  .p-nav button{width:40px;height:40px;border-radius:50%;color:var(--soft);display:grid;place-items:center;transition:color .2s,background .2s}
+  .p-nav button:hover{color:var(--text);background:var(--surface-2)}
+  .p-nav .pp{width:52px;height:52px;background:var(--accent);color:var(--bg)}
+  .p-nav .pp:hover{background:var(--accent);color:var(--bg);transform:scale(1.05)}
+  .p-nav .pp .i-pause,.p-nav .pp.playing .i-play{display:none}.p-nav .pp.playing .i-pause{display:block}
+  .p-nav button:disabled{opacity:.35;pointer-events:none}
+  .p-foot.no-nav .p-nav{display:none}
+  .p-top>div:last-child{padding-right:40px;min-width:0}
+  @media(max-width:640px){.p-cover{width:96px}.p-top h3{font-size:22px}.p-top{align-items:center}}
+  .p-foot .p-player{margin:0;min-height:80px;background:var(--surface-2);border-radius:14px;overflow:hidden;display:block}
+  .p-foot .p-player iframe{height:80px;width:100%;border:0;display:block}
+  .p-foot .gate{padding:14px 16px;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:13px}
+  .p-list li{cursor:pointer;position:relative}
+  .p-list li.has-id:hover:before,.p-list li.on:before{content:"";background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E") center/14px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E") center/14px no-repeat;color:var(--text);height:20px}
+  .p-list li.on{background:var(--surface-2)}
+  .p-list li.on b{color:var(--accent)}
+  .p-list li.on:before{color:var(--accent)}
+  .p-list li.on.paused:before{-webkit-mask:none;mask:none;background:none;content:counter(t);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -381,10 +404,9 @@
 <div class="scrim" id="scrim"></div>
 <aside class="panel" id="panel" aria-hidden="true">
   <button class="p-close" id="p-close" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-  <div class="p-top"><div class="p-cover" id="p-cover"></div><div><h3 id="p-title"></h3><div class="by" id="p-by"></div><div class="sub" id="p-sub"></div></div></div>
-  <div class="p-player" id="p-player"></div>
+  <div class="p-top"><div class="p-cover" id="p-cover"></div><div><h3 id="p-title"></h3><div class="by" id="p-by"></div><div class="sub" id="p-sub"></div><a class="p-open" id="p-open" href="#" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg>Apri su Spotify</a></div></div>
   <div class="p-list"><ol id="p-list"></ol></div>
-  <div class="p-foot"><a class="btn" id="p-open" href="#" target="_blank" rel="noopener"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Apri su Spotify</a></div>
+  <div class="p-foot"><div class="p-nav"><button type="button" id="p-prev" aria-label="Brano precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button><button type="button" id="p-pp" class="pp" aria-label="Play o pausa"><svg class="i-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button><button type="button" id="p-next" aria-label="Brano successivo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button></div><div class="p-player" id="p-player"></div></div>
 </aside>
 
 <div class="mini" id="mini" aria-hidden="true"><div id="mini-embed"></div><button class="x" id="mini-x" aria-label="Chiudi player"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -490,22 +512,59 @@ function fillIntro(){
 
 /* ---------- Pannello dettaglio con tracklist e player ---------- */
 const panel=document.getElementById("panel"),scrim=document.getElementById("scrim");
+let panelPos=0,panelCtrl=null,panelTracks=[],panelIdx=-1,panelUri="",panelEnd=false,panelEl=null;
+function panelPlayer(uri,url){
+  const pl=document.getElementById("p-player");panelUri=uri;
+  if(!uri){pl.innerHTML="";return}
+  if(!spotifyOk()){pl.innerHTML=gateHTML(url);return}
+  if(!SpotiAPI){caricaApiSpotify();const id=uri.split(":");pl.innerHTML=`<iframe src="https://open.spotify.com/embed/${id[1]}/${id[2]}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;return}
+  if(panelCtrl&&panelEl&&pl.contains(panelEl)){panelCtrl.loadUri(uri);return}
+  pl.innerHTML="";panelEl=document.createElement("div");pl.appendChild(panelEl);
+  SpotiAPI.createController(panelEl,{uri,width:"100%",height:80,theme:"dark"},c=>{panelCtrl=c;c.addListener("ready",()=>{if(panelIdx>=0)c.play()});
+    c.addListener("playback_update",ev=>{const d=ev.data||{};
+      panelPos=d.position||0;document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
+      if(!d.isPaused&&miniCtrl)miniCtrl.pause();
+      if(panelIdx>=0&&d.duration>0&&d.position>=d.duration-800&&!panelEnd){panelEnd=true;setTimeout(()=>stepRow(1),600)}});
+  });
+}
+function playRow(i){
+  const t=panelTracks[i];const rows=document.querySelectorAll("#p-list li");
+  rows.forEach(r=>r.classList.remove("on","paused"));
+  if(!t||!t.id){panelIdx=-1;return}
+  panelIdx=i;panelEnd=false;rows[i].classList.add("on");
+  if(!spotifyOk()||!SpotiAPI||!panelCtrl){panelPlayer("spotify:track:"+t.id,"https://open.spotify.com/track/"+t.id);return}
+  panelCtrl.loadUri("spotify:track:"+t.id);panelCtrl.play();
+}
 function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);
   const it=kind==="a"?albums[i]:playlists[i];
   document.getElementById("p-cover").innerHTML=kind==="a"?artAlbum(it):artPlaylist(it);
   document.getElementById("p-title").textContent=it.title;
   document.getElementById("p-by").textContent=kind==="a"?it.artist:"Playlist di Estefania";
   document.getElementById("p-sub").textContent=kind==="a"?`${fmt(it.date)} · ${it.tracks.length} brani`:`${it.tracks.length} brani · ${mins(it.tracks)} min`;
-  const pl=document.getElementById("p-player");
-  pl.innerHTML=it.id&&!spotifyOk()?gateHTML(it.url):it.id
-    ?`<iframe src="https://open.spotify.com/embed/${kind==="a"?"album":"playlist"}/${it.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`
-    :`<div class="ph-player"><span class="ph-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><div><b style="color:var(--text);font-weight:500">Qui c'è il player di Spotify</b><br>Sul sito pubblicato si ascolta direttamente da questa scheda.</div></div>`;
-  document.getElementById("p-list").innerHTML=it.tracks.map(x=>`<li><div><b>${esc(x.t)}</b><small>${esc(x.a)}</small></div><span>${dur(x.ms)}</span></li>`).join("");
+  panelTracks=it.tracks;panelIdx=-1;
+  document.getElementById("p-list").innerHTML=it.tracks.map((x,n)=>`<li data-row="${n}"${x.id?' class="has-id"':''}><div><b>${esc(x.t)}</b><small>${esc(x.a)}</small></div><span>${dur(x.ms)}</span></li>`).join("");
   document.getElementById("p-open").href=it.url;
+  document.querySelector(".p-foot").classList.toggle("no-nav",!it.tracks.some(x=>x.id));
+  panelPlayer(it.id?`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`:"",it.url);
   panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
   panel.querySelector(".p-list").scrollTop=0;
 }
-function closePanel(){panel.classList.remove("on");scrim.classList.remove("on");panel.setAttribute("aria-hidden","true");document.getElementById("p-player").innerHTML=""}
+
+function stepRow(dir){const n=panelTracks.length;if(!n)return;
+  if(dir<0&&panelIdx>=0&&panelPos>3000&&panelCtrl){panelCtrl.seek(0);return}
+  let i=panelIdx<0?(dir>0?0:n-1):panelIdx+dir;
+  while(i>=0&&i<n&&!panelTracks[i].id)i+=dir;
+  if(i<0||i>=n)return;playRow(i);
+  const li=document.querySelectorAll("#p-list li")[i];if(li)li.scrollIntoView({block:"nearest",behavior:"smooth"})}
+document.getElementById("p-prev").addEventListener("click",()=>stepRow(-1));
+document.getElementById("p-next").addEventListener("click",()=>stepRow(1));
+document.getElementById("p-pp").addEventListener("click",()=>{if(panelIdx<0){stepRow(1);return}if(panelCtrl)panelCtrl.togglePlay()});
+document.getElementById("p-list").addEventListener("click",e=>{const li=e.target.closest("li[data-row]");if(!li)return;
+  const n=+li.dataset.row;
+  if(!panelTracks[n]||!panelTracks[n].id){if(panelCtrl){panelCtrl.loadUri(panelUri);panelCtrl.play()}return}
+  if(n===panelIdx&&panelCtrl){panelCtrl.togglePlay();return}
+  playRow(n)});
+function closePanel(){panel.classList.remove("on");scrim.classList.remove("on");panel.setAttribute("aria-hidden","true");if(panelCtrl){try{panelCtrl.destroy()}catch(e){}}panelCtrl=null;panelEl=null;panelIdx=-1;document.getElementById("p-pp").classList.remove("playing");document.getElementById("p-player").innerHTML=""}
 document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]");if(c){e.preventDefault();openPanel(c.dataset.kind,+c.dataset.i)}});
 scrim.addEventListener("click",closePanel);document.getElementById("p-close").addEventListener("click",closePanel);
 addEventListener("keydown",e=>{if(e.key==="Escape")closePanel()});
@@ -530,8 +589,8 @@ function openTrack(t){window._lastOpen=()=>openTrack(t);
   document.getElementById("p-cover").innerHTML=t.img?`<img class="art" src="${t.img}" alt="">`:"";
   document.getElementById("p-title").textContent=t.t;document.getElementById("p-by").textContent=t.a;
   document.getElementById("p-sub").textContent="";
-  document.getElementById("p-player").innerHTML=t.id&&!spotifyOk()?gateHTML(t.url):t.id?`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`:"";
-  document.getElementById("p-list").innerHTML="";document.getElementById("p-open").href=t.url;
+  panelTracks=[];panelIdx=-1;document.querySelector(".p-foot").classList.add("no-nav");document.getElementById("p-list").innerHTML="";document.getElementById("p-open").href=t.url;
+  panelPlayer(t.id?"spotify:track:"+t.id:"",t.url);
   panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
 }
 function fillTop(){
@@ -550,7 +609,7 @@ function playMini(t){
     document.getElementById("mini-embed").innerHTML=`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;return;}
   if(miniCtrl){miniCtrl.loadUri(uri);miniCtrl.play();return;}
   const el=document.createElement("div");document.getElementById("mini-embed").innerHTML="";document.getElementById("mini-embed").appendChild(el);
-  SpotiAPI.createController(el,{uri,width:"100%",height:80,theme:"dark"},c=>{miniCtrl=c;c.addListener("ready",()=>c.play());});
+  SpotiAPI.createController(el,{uri,width:"100%",height:80,theme:"dark"},c=>{miniCtrl=c;c.addListener("ready",()=>c.play());c.addListener("playback_update",ev=>{if(ev.data&&!ev.data.isPaused&&panelCtrl)panelCtrl.pause()});});
 }
 document.getElementById("mini-x").addEventListener("click",()=>{
   if(miniCtrl)miniCtrl.pause();const box=document.getElementById("mini");box.classList.remove("on");box.setAttribute("aria-hidden","true");
