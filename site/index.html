@@ -183,6 +183,17 @@
   .top10 .pl{opacity:0;transition:opacity .25s;color:var(--text)}
   .top10 li a:hover .pl{opacity:1}
   @media (max-width:800px){.top10 ol{grid-template-columns:1fr}}
+  .top10 .th{position:relative;width:48px;height:48px;border-radius:10px;overflow:hidden;display:block}
+  .top10 .th img,.top10 .th .ph{display:block;width:100%;height:100%}
+  .top10 .th .ov{position:absolute;inset:0;display:grid;place-items:center;background:rgba(17,16,19,.55);color:#fff;opacity:0;transition:opacity .25s}
+  .top10 li a:hover .th .ov,.top10 li a.playing .th .ov{opacity:1}
+  .top10 li a.playing b{color:#f08bc8}
+  /* Mini player in basso */
+  .mini{position:fixed;left:50%;bottom:16px;transform:translate(-50%,calc(100% + 40px));visibility:hidden;width:min(720px,calc(100vw - 24px));z-index:45;background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:8px 48px 8px 8px;box-shadow:0 20px 50px rgba(0,0,0,.45);transition:transform .45s var(--ease)}
+  .mini.on{transform:translate(-50%,0);visibility:visible}
+  .mini iframe{display:block;width:100%;height:80px;border:0;border-radius:12px}
+  .mini .x{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:var(--surface);color:var(--soft);display:grid;place-items:center}
+  .mini .x:hover{color:var(--text)}
   .badge{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--surface-2);background:var(--surface);border-radius:var(--r-pill);padding:4px 14px 4px 4px;font-size:14px;color:var(--soft)}
   .badge b{background:var(--text);color:var(--bg);font-weight:500;font-size:12px;padding:3px 10px;border-radius:var(--r-pill)}
   .btn{display:inline-flex;align-items:center;gap:12px;background:var(--text);color:var(--bg);border-radius:16px;padding:10px 22px 10px 10px;font-weight:500;font-size:15px}
@@ -329,6 +340,8 @@
   <div class="p-foot"><a class="btn" id="p-open" href="#" target="_blank" rel="noopener"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></i>Apri su Spotify</a></div>
 </aside>
 
+<div class="mini" id="mini" aria-hidden="true"><div id="mini-embed"></div><button class="x" id="mini-x" aria-label="Chiudi player"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 <footer><div class="wrap"><span>© 2026 Estefania Zappatore · Caffè in Cuffia™</span><span class="disc">Progetto personale, non affiliato né sponsorizzato da Spotify. Brani e copertine appartengono ai rispettivi artisti ed etichette.</span></div></footer>
 
 <script>
@@ -462,9 +475,27 @@ function openTrack(t){
 function fillTop(){
   const top=DATA.top||[];if(!top.length)return;
   document.getElementById("top10").style.display="";
-  document.getElementById("top10-list").innerHTML=top.map((t,i)=>`<li><a href="#" data-top="${i}"><span class="rk">${i+1}</span>${t.img?`<img src="${t.img}" alt="" loading="lazy">`:`<span class="ph" style="${grad(PALETTE[i%12])}"></span>`}<span style="min-width:0"><b>${esc(t.t)}</b><small>${esc(t.a)}</small></span><span class="pl"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></a></li>`).join("");
+  document.getElementById("top10-list").innerHTML=top.map((t,i)=>`<li><a href="#" data-top="${i}"><span class="rk">${i+1}</span><span class="th">${t.img?`<img src="${t.img}" alt="" loading="lazy">`:`<span class="ph" style="${grad(PALETTE[i%12])}"></span>`}<span class="ov"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></span><span style="min-width:0"><b>${esc(t.t)}</b><small>${esc(t.a)}</small></span><span class="pl"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></a></li>`).join("");
 }
-document.addEventListener("click",e=>{const a=e.target.closest("[data-top]");if(a){e.preventDefault();openTrack(DATA.top[+a.dataset.top])}});
+/* Top 10: player in basso che parte subito */
+let SpotiAPI=null,miniCtrl=null,miniPending=null;
+window.onSpotifyIframeApiReady=api=>{SpotiAPI=api;if(miniPending){playMini(miniPending);miniPending=null}};
+function playMini(t){
+  const box=document.getElementById("mini");box.classList.add("on");box.setAttribute("aria-hidden","false");
+  const uri="spotify:track:"+t.id;
+  if(!SpotiAPI){ // API non ancora caricata: ripiego sul player normale
+    document.getElementById("mini-embed").innerHTML=`<iframe src="https://open.spotify.com/embed/track/${t.id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;return;}
+  if(miniCtrl){miniCtrl.loadUri(uri);miniCtrl.play();return;}
+  const el=document.createElement("div");document.getElementById("mini-embed").innerHTML="";document.getElementById("mini-embed").appendChild(el);
+  SpotiAPI.createController(el,{uri,width:"100%",height:80,theme:"dark"},c=>{miniCtrl=c;c.addListener("ready",()=>c.play());});
+}
+document.getElementById("mini-x").addEventListener("click",()=>{
+  if(miniCtrl)miniCtrl.pause();const box=document.getElementById("mini");box.classList.remove("on");box.setAttribute("aria-hidden","true");
+  document.querySelectorAll("[data-top].playing").forEach(x=>x.classList.remove("playing"));});
+document.addEventListener("click",e=>{const a=e.target.closest("[data-top]");if(!a)return;e.preventDefault();
+  const t=DATA.top[+a.dataset.top];
+  document.querySelectorAll("[data-top].playing").forEach(x=>x.classList.remove("playing"));a.classList.add("playing");
+  if(t.id)playMini(t);else openTrack(t);});
 const fa=iso=>{const m=Math.round((Date.now()-new Date(iso))/60000);if(m<1)return "adesso";if(m<60)return `${m} min fa`;const h=Math.round(m/60);if(h<24)return h===1?"1 ora fa":`${h} ore fa`;const g=Math.round(h/24);return g===1?"ieri":`${g} giorni fa`};
 async function nowPlaying(){
   if(document.hidden)return;
