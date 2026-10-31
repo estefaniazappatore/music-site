@@ -24,7 +24,7 @@ token = {"access_token": "", "refresh_token": os.environ["SPOTIFY_REFRESH_TOKEN"
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=os.environ["SPOTIFY_CLIENT_ID"], client_secret=os.environ["SPOTIFY_CLIENT_SECRET"],
     redirect_uri="http://127.0.0.1:8888/callback", scope=SCOPE, open_browser=False,
-    cache_handler=MemoryCacheHandler(token_info=token)), retries=3, status_retries=3, backoff_factor=2)
+    cache_handler=MemoryCacheHandler(token_info=token)), retries=0, status_retries=0, requests_timeout=20)
 
 done = json.loads(DONE.read_text()) if DONE.exists() else {}
 data = json.loads((ROOT / "site" / "data.json").read_text(encoding="utf-8"))

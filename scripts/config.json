@@ -9,8 +9,8 @@
   "max_brani_album": 60,
   "escludi": [],
   "forza_anno": {},
-  "carica_copertine_su_spotify": false,
-  "copertine_per_notte": 40,
+  "carica_copertine_su_spotify": true,
+  "copertine_per_notte": 15,
   "max_letture_per_esecuzione": 60,
   "pausa_secondi": 2.0
 }
