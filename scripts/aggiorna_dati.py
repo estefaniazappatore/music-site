@@ -18,7 +18,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import spotipy
@@ -31,6 +31,18 @@ CONFIG = json.loads((ROOT / "scripts" / "config.json").read_text(encoding="utf-8
 CACHE_FILE = ROOT / "scripts" / "cache.json"
 OUT_FILE = ROOT / "site" / "data.json"
 SCOPE = "playlist-read-private playlist-read-collaborative user-top-read"
+
+
+STATO_FILE = ROOT / "scripts" / "stato_spotify.json"
+
+
+def salta_giro(motivo):
+    """Niente richieste a Spotify in questo giro: lo dico a GitHub così salta anche i passi dopo."""
+    print(motivo)
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a") as f:
+            f.write("salta=true\n")
 
 
 class LimiteRaggiunto(Exception):
@@ -64,7 +76,12 @@ def chiama(fn, *args, **kw):
         return fn(*args, **kw)
     except SpotifyException as e:
         if e.http_status == 429 or "Max Retries" in str(e):
-            raise LimiteRaggiunto() from e
+            attesa = None
+            try:
+                attesa = int((getattr(e, "headers", None) or {}).get("Retry-After"))
+            except (TypeError, ValueError):
+                pass
+            raise LimiteRaggiunto(attesa or 3600) from e
         raise
 
 
@@ -153,6 +170,17 @@ def classifica(p, brani):
 
 
 def main():
+    # giro ogni ora, ma lavora davvero solo se: il blocco di Spotify è finito,
+    # e sono passate 6 ore dall'ultimo giro (oppure il giro prima era stato bloccato)
+    st = json.loads(STATO_FILE.read_text(encoding="utf-8")) if STATO_FILE.exists() else {}
+    ora = datetime.now(timezone.utc)
+    if st.get("bloccato_fino") and ora < datetime.fromisoformat(st["bloccato_fino"]):
+        return salta_giro(f"Spotify ci ha chiesto di aspettare fino a {st['bloccato_fino']} UTC: salto questo giro.")
+    manuale = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
+    if (not manuale and not st.get("bloccato_fino") and st.get("ultimo_giro")
+            and ora - datetime.fromisoformat(st["ultimo_giro"]) < timedelta(hours=5, minutes=45)):
+        return salta_giro("Ultimo giro meno di 6 ore fa: salto.")
+    bloccato = None
     cache = json.loads(CACHE_FILE.read_text(encoding="utf-8")) if CACHE_FILE.exists() else {}
     sp = client()
     parziale = False
@@ -184,6 +212,14 @@ def main():
         limite = CONFIG.get("max_letture_per_esecuzione", 200)
         for p in sorted(tutte, key=lambda p: (da_fare(p), priorita(p))):
             if da_fare(p) == 2:
+                # rinominare una playlist su Spotify non cambia lo snapshot:
+                # aggiorno nome, numero e copertina senza rileggerla (zero richieste in più)
+                v = cache[p["id"]].get("voce")
+                if cache[p["id"]].get("tipo") == "caffe" and v and v.get("title") != p["name"]:
+                    num = re.search(r"(\d+)", p["name"])
+                    imgs = p.get("images") or []
+                    v.update(title=p["name"], num=int(num.group(1)) if num else None,
+                             img=imgs[0]["url"] if imgs else v.get("img"))
                 continue
             totale = (p.get("items") or p.get("tracks") or {}).get("total", 0)
             e_caffe = re.search(CONFIG["caffe_pattern"], p["name"], re.I)
@@ -205,7 +241,8 @@ def main():
             for pid in list(cache):
                 if pid not in viste:
                     del cache[pid]
-    except LimiteRaggiunto:
+    except LimiteRaggiunto as e:
+        bloccato = e.args[0] if e.args else 3600
         parziale = True
         print("Limite di Spotify raggiunto: salvo i progressi e riprendo alla prossima esecuzione.")
 
@@ -219,6 +256,8 @@ def main():
         unici.setdefault((a["id"], a["year"]), a)
     top = []
     try:
+        if bloccato:
+            raise RuntimeError("Spotify ci ha bloccati, uso la top 10 salvata")
         for t in chiama(sp.current_user_top_tracks, limit=10, time_range="short_term")["items"]:
             imgs = (t.get("album") or {}).get("images") or []
             top.append({"id": t["id"], "t": t["name"], "a": ", ".join(a["name"] for a in t["artists"]),
@@ -238,6 +277,15 @@ def main():
     anni = {y: sum(1 for a in data["albums"] if a["year"] == y) for y in CONFIG["anni_best_albums"]}
     print(f"Playlist rilette oggi: {lette}{' (parziale)' if parziale else ''}")
     print(f"Caffè in cuffia: {len(playlists)} · Best Albums: {anni}")
+
+    st["ultimo_giro"] = ora.isoformat(timespec="minutes")
+    if bloccato:
+        fino = datetime.now(timezone.utc) + timedelta(seconds=bloccato + 60)
+        st["bloccato_fino"] = fino.isoformat(timespec="minutes")
+        salta_giro(f"Riprendo da solo dopo le {fino:%H:%M} UTC.")
+    else:
+        st.pop("bloccato_fino", None)
+    STATO_FILE.write_text(json.dumps(st), encoding="utf-8")
 
 
 if __name__ == "__main__":
