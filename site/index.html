@@ -246,6 +246,12 @@
   .p-nav .pp .i-pause,.p-nav .pp.playing .i-play{display:none}.p-nav .pp.playing .i-pause{display:block}
   .p-nav button:disabled{opacity:.35;pointer-events:none}
   .p-foot.no-nav .p-nav{display:none}
+  .p-cw{position:relative;flex:none}
+  .cv-play{position:absolute;right:10px;bottom:10px;width:48px;height:48px;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center;opacity:0;transform:translateY(6px);transition:opacity .25s var(--ease),transform .25s var(--ease);box-shadow:0 8px 20px rgba(0,0,0,.35)}
+  .p-cw:hover .cv-play,.cv-play.playing{opacity:1;transform:none}
+  .cv-play:hover{transform:scale(1.06)}
+  .cv-play .i-pause,.cv-play.playing .i-play{display:none}.cv-play.playing .i-pause{display:block}
+  .panel.m .cv-play{display:none}
   .p-big{display:none}
   .p-dock{display:none}
   .panel.docked{top:auto;right:auto;left:50%;bottom:16px;width:min(760px,calc(100vw - 24px));transform:translateX(-50%);transition:none;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
@@ -433,7 +439,7 @@
 <div class="scrim" id="scrim"></div>
 <aside class="panel" id="panel" aria-hidden="true">
   <button class="p-close" id="p-close" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-  <div class="p-top"><div class="p-cover" id="p-cover"></div><div><h3 id="p-title"></h3><div class="by" id="p-by"></div><div class="sub" id="p-sub"></div><a class="p-open" id="p-open" href="#" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg>Apri su Spotify</a></div></div>
+  <div class="p-top"><div class="p-cw"><div class="p-cover" id="p-cover"></div><button type="button" class="cv-play" id="cv-play" aria-label="Ascolta dall'inizio"><svg class="i-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button></div><div><h3 id="p-title"></h3><div class="by" id="p-by"></div><div class="sub" id="p-sub"></div><a class="p-open" id="p-open" href="#" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg>Apri su Spotify</a></div></div>
   <div class="p-big" id="p-big"></div>
   <div class="p-list"><ol id="p-list"></ol></div>
   <div class="p-foot"><div class="p-nav"><button type="button" id="p-prev" aria-label="Brano precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button><button type="button" id="p-pp" class="pp" aria-label="Play o pausa"><svg class="i-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button><button type="button" id="p-next" aria-label="Brano successivo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button></div><div class="p-hint" id="p-hint">Tocca <b>▶</b> qui sotto per ascoltare</div><div class="p-player" id="p-player"></div><div class="p-dock"><button type="button" id="p-dock-open" aria-label="Apri la lista"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" id="p-dock-x" aria-label="Chiudi il player"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></div>
@@ -558,12 +564,13 @@ function panelPlayer(uri,url){
   setTimeout(()=>{if(!pronto&&panelUri===uri&&tent<1){panelPlayer.tent=tent+1;panelCtrl=null;panelEl=null;panelPlayer(uri,url)}else panelPlayer.tent=0},8000);
   SpotiAPI.createController(panelEl,{uri,width:"100%",height:80,theme:"dark"},c=>{panelCtrl=c;c.addListener("ready",()=>{pronto=true;panelPlayer.tent=0});c.addListener("ready",()=>{if(panelWant)tryPlay()});
     c.addListener("playback_update",ev=>{const d=ev.data||{};
-      panelPos=d.position||0;panelPaused=!!d.isPaused;if(!d.isPaused)hint(false);if(!d.isPaused&&panelIdx>=0){const r=qRows()[panelIdx];if(r&&!r.classList.contains("on"))r.classList.add("on")}document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
+      panelPos=d.position||0;panelPaused=!!d.isPaused;syncCover();if(!d.isPaused)hint(false);if(!d.isPaused&&panelIdx>=0){const r=qRows()[panelIdx];if(r&&!r.classList.contains("on"))r.classList.add("on")}document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
       if(!d.isPaused&&miniCtrl)miniCtrl.pause();
       if(panelIdx>=0&&d.duration>0&&d.position>=d.duration-800&&!panelEnd){panelEnd=true;setTimeout(()=>stepRow(1),600)}});
   });
 }
 const qRows=()=>viewTracks===panelTracks?document.querySelectorAll("#p-list li"):[];
+function syncCover(){document.getElementById("cv-play").classList.toggle("playing",viewTracks===panelTracks&&!panelPaused&&!!panelCtrl)}
 function hint(v){clearTimeout(hintT);document.getElementById("p-hint").classList.toggle("on",v)}
 /* sul telefono il browser spesso non lascia partire l'audio da un comando del sito:
    se dopo un attimo non suona ancora, invitiamo a toccare il play di Spotify */
@@ -599,12 +606,12 @@ function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);panel.classLis
   panel.classList.remove("m");
   if(occupato){ // sta già suonando altro: mostro solo i brani, la musica continua
     const r=qRows()[panelIdx];if(r)r.classList.add("on");
-    panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");panel.querySelector(".p-list").scrollTop=0;return}
+    panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");panel.querySelector(".p-list").scrollTop=0;syncCover();return}
   const primo=it.tracks.findIndex(x=>x.id);
   if(primo>=0){panelIdx=primo;panelEnd=false;panelPlayer("spotify:track:"+it.tracks[primo].id,it.url)}
   else panelPlayer(it.id?`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`:"",it.url);
   panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
-  panel.querySelector(".p-list").scrollTop=0;
+  panel.querySelector(".p-list").scrollTop=0;syncCover();
 }
 
 function stepRow(dir){const n=panelTracks.length;if(!n)return;
@@ -616,6 +623,14 @@ function stepRow(dir){const n=panelTracks.length;if(!n)return;
 document.getElementById("p-prev").addEventListener("click",()=>stepRow(-1));
 document.getElementById("p-next").addEventListener("click",()=>stepRow(1));
 document.getElementById("p-pp").addEventListener("click",()=>{if(panelIdx<0){stepRow(1);return}if(!panelCtrl)return;if(panelPaused)tryPlay();else panelCtrl.pause()});
+
+document.getElementById("cv-play").addEventListener("click",()=>{
+  if(viewTracks===panelTracks&&panelCtrl&&!panelPaused){panelCtrl.pause();return}
+  panelTracks=viewTracks;playSrc=viewSrc;panelIdx=-1;
+  document.querySelector(".p-foot").classList.toggle("no-nav",!panelTracks.some(x=>x.id));
+  if(panelTracks.some(x=>x.id)){stepRow(1);return}
+  if(panelCtrl){panelUri=viewUri;panelCtrl.loadUri(viewUri);tryPlay()}else{panelWant=true;panelPlayer(viewUri,"")}
+});
 document.getElementById("p-list").addEventListener("click",e=>{const li=e.target.closest("li[data-row]");if(!li)return;
   const n=+li.dataset.row;
   if(viewTracks!==panelTracks){panelTracks=viewTracks;playSrc=viewSrc;panelIdx=-1;document.querySelector(".p-foot").classList.toggle("no-nav",!panelTracks.some(x=>x.id))}
