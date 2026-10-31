@@ -191,12 +191,28 @@ def main():
         tutte = list(mie_playlist(sp, me))
         viste = {p["id"] for p in tutte}
 
+        # le Caffè in cuffia rinominate su Spotify: aggiorno nome, numero e copertina
+        # subito, senza rileggerle (rinominare non cambia lo snapshot, quindi Spotify non lo segnala)
+        for p in tutte:
+            v = cache.get(p["id"]) or {}
+            voce = v.get("voce")
+            if v.get("tipo") == "caffe" and voce and voce.get("title") != p["name"]:
+                num = re.search(r"(\d+)", p["name"])
+                imgs = p.get("images") or []
+                voce.update(title=p["name"], num=int(num.group(1)) if num else None,
+                            img=imgs[0]["url"] if imgs else voce.get("img"))
+                print("Rinominata:", p["name"])
+        noti = [v["voce"]["num"] for v in cache.values()
+                if v.get("tipo") == "caffe" and v.get("voce") and v["voce"].get("num")]
+        max_noto = max(noti) if noti else 0
+
         def priorita(p):
-            # prima le Caffè in cuffia dalla più recente (numero più alto), poi il resto nell'ordine della libreria
+            # 1) le Caffè in cuffia nuove della settimana, 2) gli album, 3) le Caffè più vecchie
             if re.search(CONFIG["caffe_pattern"], p["name"], re.I):
                 n = re.search(r"(\d+)", p["name"])
-                return (1, -(int(n.group(1)) if n else 0))
-            return (0, 0)
+                num = int(n.group(1)) if n else 0
+                return (0 if num > max_noto else 2, -num)
+            return (1, 0)
 
         def senza_id(v):
             # voci lette prima che salvassimo l'ID dei brani: da rileggere, con calma
@@ -212,14 +228,6 @@ def main():
         limite = CONFIG.get("max_letture_per_esecuzione", 200)
         for p in sorted(tutte, key=lambda p: (da_fare(p), priorita(p))):
             if da_fare(p) == 2:
-                # rinominare una playlist su Spotify non cambia lo snapshot:
-                # aggiorno nome, numero e copertina senza rileggerla (zero richieste in più)
-                v = cache[p["id"]].get("voce")
-                if cache[p["id"]].get("tipo") == "caffe" and v and v.get("title") != p["name"]:
-                    num = re.search(r"(\d+)", p["name"])
-                    imgs = p.get("images") or []
-                    v.update(title=p["name"], num=int(num.group(1)) if num else None,
-                             img=imgs[0]["url"] if imgs else v.get("img"))
                 continue
             totale = (p.get("items") or p.get("tracks") or {}).get("total", 0)
             e_caffe = re.search(CONFIG["caffe_pattern"], p["name"], re.I)
