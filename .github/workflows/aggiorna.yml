@@ -2,7 +2,7 @@ name: Aggiorna dati Spotify
 
 on:
   schedule:
-  - cron: "17 */6 * * *"
+  - cron: "17 * * * *"   # ogni ora, ma lo script lavora davvero solo ogni 6 ore o a blocco di Spotify finito
   workflow_dispatch:
 
 permissions:
@@ -30,17 +30,20 @@ jobs:
           node-version: "22"
       - run: pip install spotipy
       - name: Leggi Spotify e rigenera data.json
+        id: dati
         run: python scripts/aggiorna_dati.py
       - name: Genera le copertine mancanti
+        if: steps.dati.outputs.salta != 'true'
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
           node scripts/genera_copertine.js
       - name: Carica le copertine su Spotify
+        if: steps.dati.outputs.salta != 'true'
         run: python scripts/carica_copertine.py
       - name: Salva le novità
         run: |
           git config user.name "music-bot"
           git config user.email "music-bot@users.noreply.github.com"
-          git add site/ scripts/cache.json scripts/copertine_caricate.json 2>/dev/null || git add site/ scripts/cache.json
+          git add site/ scripts/cache.json; git add scripts/stato_spotify.json scripts/copertine_caricate.json 2>/dev/null; git add scripts/stato_spotify.json 2>/dev/null; true
           git diff --cached --quiet || (git commit -m "Aggiornamento dati $(date -u +%F)" && for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done; git diff --quiet origin/main HEAD)
