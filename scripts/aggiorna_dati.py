@@ -226,20 +226,20 @@ def main():
             return 1 if senza_id(v) else 2
 
         limite = CONFIG.get("max_letture_per_esecuzione", 200)
-        def mescola(lista):
-            # dentro ogni gruppo: prima le Caffè nuove, poi 2 album e 1 Caffè vecchia a turno,
-            # così le Caffè più vecchie arrivano un po' a ogni giro invece di aspettare tutti gli album
-            nuove = [p for p in lista if priorita(p)[0] == 0]
-            alb = [p for p in lista if priorita(p)[0] == 1]
-            vecchie = [p for p in lista if priorita(p)[0] == 2]
-            out = list(nuove)
-            while alb or vecchie:
-                out += alb[:2] + vecchie[:1]
-                alb, vecchie = alb[2:], vecchie[1:]
-            return out
-
+        # ordine di lettura di ogni giro:
+        # 1) le Caffè nuove della settimana
+        # 2) poi a turno: una playlist già sul sito a cui mancano i codici dei brani (le Caffè più recenti prima),
+        #    una playlist mai letta (album e altro), una Caffè vecchia mai letta
         ordinate = sorted(tutte, key=lambda p: (da_fare(p), priorita(p)))
-        ordine = mescola([p for p in ordinate if da_fare(p) == 0]) + mescola([p for p in ordinate if da_fare(p) == 1])
+        nuove = [p for p in ordinate if da_fare(p) == 0 and priorita(p)[0] == 0]
+        codici = sorted([p for p in ordinate if da_fare(p) == 1],
+                        key=lambda p: (0, priorita(p)[1]) if priorita(p)[0] != 1 else (1, 0))
+        mai_lette = [p for p in ordinate if da_fare(p) == 0 and priorita(p)[0] == 1]
+        vecchie = [p for p in ordinate if da_fare(p) == 0 and priorita(p)[0] == 2]
+        ordine = list(nuove)
+        while codici or mai_lette or vecchie:
+            ordine += codici[:1] + mai_lette[:1] + vecchie[:1]
+            codici, mai_lette, vecchie = codici[1:], mai_lette[1:], vecchie[1:]
         for p in ordine:
             if da_fare(p) == 2:
                 continue
