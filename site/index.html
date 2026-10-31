@@ -65,6 +65,8 @@
   .seg button{padding:9px 18px;border-radius:12px;font-size:14px;font-weight:500;color:var(--muted);transition:all .25s var(--ease)}
   .seg button.on{background:var(--text);color:var(--bg)}
   .seg button:not(.on):hover{color:var(--text)}
+  .seg[data-group="a-sort"] button.on:after{content:"↓";margin-left:6px;font-weight:600}
+  .seg[data-group="a-sort"] button.on.rev:after{content:"↑"}
   .search{flex:1;min-width:200px;max-width:340px;margin-left:auto;position:relative}
   .search input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 20px 14px 46px;color:var(--text);font:inherit;font-size:14px;outline:none;transition:border-color .25s}
   .search input:focus{border-color:rgba(255,255,255,.3)}
@@ -471,7 +473,7 @@ const dur=ms=>{const s=Math.round(ms/1000);return `${Math.floor(s/60)}:${String(
 const mins=t=>Math.round(t.reduce((x,y)=>x+y.ms,0)/60000);
 const arrow='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M8 7h9v9"/></svg>';
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const state={"c-sort":"recenti","a-year":"2026","a-sort":"uscita"};
+const state={"c-sort":"recenti","a-year":"2026","a-sort":"uscita","c-sort-dir":1,"a-sort-dir":1};
 const grad=p=>`background:linear-gradient(145deg,${p[0]},${p[1]})`;
 
 function artAlbum(a){return a.img?`<img class="art" src="${a.img}" alt="" loading="lazy">`:`<div class="art ph" style="${grad(a.pal)}">${esc(a.title)}</div>`}
@@ -510,15 +512,19 @@ function renderA(){
   const q=document.getElementById("a-q").value.trim().toLowerCase();
   let list=albums.filter(a=>a.year===state["a-year"]&&(a.title+" "+a.artist).toLowerCase().includes(q));
   list.sort(state["a-sort"]==="az"?(a,b)=>a.title.localeCompare(b.title,"it"):(a,b)=>(b.date||"").localeCompare(a.date||""));
+  if(state["a-sort-dir"]<0)list.reverse();
   const g=document.getElementById("a-grid");
   g.innerHTML=list.length?list.map(albumCard).join(""):'<p class="empty">Nessun album trovato.</p>';
   document.getElementById("a-count").textContent=list.length+" album";
   reveal(g);
 }
 document.querySelectorAll(".seg").forEach(seg=>seg.addEventListener("click",e=>{
-  const b=e.target.closest("button");if(!b)return;
+  const b=e.target.closest("button");if(!b)return;const g=seg.dataset.group;
+  if(g==="a-sort"){ // secondo clic sullo stesso pulsante: ordine al contrario
+    state[g+"-dir"]=state[g]===b.dataset.val?-state[g+"-dir"]:1;
+    seg.querySelectorAll("button").forEach(x=>{x.classList.toggle("rev",x===b&&state[g+"-dir"]<0)});}
   seg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
-  state[seg.dataset.group]=b.dataset.val;
+  state[g]=b.dataset.val;
   seg.dataset.group.startsWith("c")?renderC():renderA();
 }));
 document.getElementById("c-q").addEventListener("input",renderC);
