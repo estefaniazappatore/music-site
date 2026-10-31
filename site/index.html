@@ -540,7 +540,7 @@ function fillIntro(){
 
 /* ---------- Pannello dettaglio con tracklist e player ---------- */
 const panel=document.getElementById("panel"),scrim=document.getElementById("scrim");
-let hintT=null,panelPaused=true,panelWant=false,panelPos=0,panelCtrl=null,panelTracks=[],panelIdx=-1,panelUri="",panelEnd=false,panelEl=null;
+let playSrc=null,viewSrc=null,viewTracks=[],viewUri="",hintT=null,panelPaused=true,panelWant=false,panelPos=0,panelCtrl=null,panelTracks=[],panelIdx=-1,panelUri="",panelEnd=false,panelEl=null;
 function panelPlayer(uri,url){
   const pl=document.getElementById("p-player");panelUri=uri;
   if(!uri){pl.innerHTML="";return}
@@ -552,20 +552,21 @@ function panelPlayer(uri,url){
   setTimeout(()=>{if(!pronto&&panelUri===uri&&tent<1){panelPlayer.tent=tent+1;panelCtrl=null;panelEl=null;panelPlayer(uri,url)}else panelPlayer.tent=0},8000);
   SpotiAPI.createController(panelEl,{uri,width:"100%",height:80,theme:"dark"},c=>{panelCtrl=c;c.addListener("ready",()=>{pronto=true;panelPlayer.tent=0});c.addListener("ready",()=>{if(panelWant)tryPlay()});
     c.addListener("playback_update",ev=>{const d=ev.data||{};
-      panelPos=d.position||0;panelPaused=!!d.isPaused;if(!d.isPaused)hint(false);if(!d.isPaused&&panelIdx>=0){const r=document.querySelectorAll("#p-list li")[panelIdx];if(r&&!r.classList.contains("on"))r.classList.add("on")}document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
+      panelPos=d.position||0;panelPaused=!!d.isPaused;if(!d.isPaused)hint(false);if(!d.isPaused&&panelIdx>=0){const r=qRows()[panelIdx];if(r&&!r.classList.contains("on"))r.classList.add("on")}document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
       if(!d.isPaused&&miniCtrl)miniCtrl.pause();
       if(panelIdx>=0&&d.duration>0&&d.position>=d.duration-800&&!panelEnd){panelEnd=true;setTimeout(()=>stepRow(1),600)}});
   });
 }
+const qRows=()=>viewTracks===panelTracks?document.querySelectorAll("#p-list li"):[];
 function hint(v){clearTimeout(hintT);document.getElementById("p-hint").classList.toggle("on",v)}
 /* sul telefono il browser spesso non lascia partire l'audio da un comando del sito:
    se dopo un attimo non suona ancora, invitiamo a toccare il play di Spotify */
 function tryPlay(){if(!panelCtrl)return;panelCtrl.play();clearTimeout(hintT);hintT=setTimeout(()=>{if(panelPaused)hint(true)},1800)}
 function playRow(i){
-  const t=panelTracks[i];const rows=document.querySelectorAll("#p-list li");
+  const t=panelTracks[i];const rows=qRows();
   rows.forEach(r=>r.classList.remove("on","paused"));
   if(!t||!t.id){panelIdx=-1;return}
-  panelIdx=i;panelEnd=false;panelWant=true;rows[i].classList.add("on");
+  panelIdx=i;panelEnd=false;panelWant=true;if(rows[i])rows[i].classList.add("on");
   if(!spotifyOk()||!SpotiAPI||!panelCtrl){panelPlayer("spotify:track:"+t.id,"https://open.spotify.com/track/"+t.id);return}
   panelCtrl.loadUri("spotify:track:"+t.id);tryPlay();
 }
@@ -580,13 +581,19 @@ function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);panel.classLis
   document.getElementById("p-title").textContent=it.title;
   document.getElementById("p-by").textContent=kind==="a"?it.artist:"Playlist di Estefania";
   document.getElementById("p-sub").textContent=kind==="a"?`${fmt(it.date)} · ${it.tracks.length} brani`:`${it.tracks.length} brani · ${mins(it.tracks)} min`;
-  panelTracks=it.tracks;panelIdx=-1;panelWant=false;
+  const uriIt=it.id?`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`:"";
+  const occupato=!MOBILE&&panelCtrl&&!panelPaused;
+  viewTracks=it.tracks;viewUri=uriIt;viewSrc=[kind,i];
+  if(!occupato){playSrc=viewSrc;panelTracks=it.tracks;panelIdx=-1;panelWant=false;}
   document.getElementById("p-list").innerHTML=it.tracks.map((x,n)=>`<li data-row="${n}"${x.id?' class="has-id"':''}><div><b>${esc(x.t)}</b><small>${esc(x.a)}</small></div><span class="dr"><i class="eq"><i></i><i></i><i></i></i>${dur(x.ms)}</span></li>`).join("");
   document.getElementById("p-open").href=it.url;
-  document.querySelector(".p-foot").classList.toggle("no-nav",!it.tracks.some(x=>x.id));
+  if(!occupato)document.querySelector(".p-foot").classList.toggle("no-nav",!it.tracks.some(x=>x.id));
   if(MOBILE&&it.id){bigPlayer(`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`,it.url);
     panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");return}
   panel.classList.remove("m");
+  if(occupato){ // sta già suonando altro: mostro solo i brani, la musica continua
+    const r=qRows()[panelIdx];if(r)r.classList.add("on");
+    panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");panel.querySelector(".p-list").scrollTop=0;return}
   const primo=it.tracks.findIndex(x=>x.id);
   if(primo>=0){panelIdx=primo;panelEnd=false;panelPlayer("spotify:track:"+it.tracks[primo].id,it.url)}
   else panelPlayer(it.id?`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`:"",it.url);
@@ -599,13 +606,14 @@ function stepRow(dir){const n=panelTracks.length;if(!n)return;
   let i=panelIdx<0?(dir>0?0:n-1):panelIdx+dir;
   while(i>=0&&i<n&&!panelTracks[i].id)i+=dir;
   if(i<0||i>=n)return;playRow(i);
-  const li=document.querySelectorAll("#p-list li")[i];if(li)li.scrollIntoView({block:"nearest",behavior:"smooth"})}
+  const li=qRows()[i];if(li)li.scrollIntoView({block:"nearest",behavior:"smooth"})}
 document.getElementById("p-prev").addEventListener("click",()=>stepRow(-1));
 document.getElementById("p-next").addEventListener("click",()=>stepRow(1));
 document.getElementById("p-pp").addEventListener("click",()=>{if(panelIdx<0){stepRow(1);return}if(!panelCtrl)return;if(panelPaused)tryPlay();else panelCtrl.pause()});
 document.getElementById("p-list").addEventListener("click",e=>{const li=e.target.closest("li[data-row]");if(!li)return;
   const n=+li.dataset.row;
-  if(!panelTracks[n]||!panelTracks[n].id){if(panelCtrl){panelCtrl.loadUri(panelUri);tryPlay()}return}
+  if(viewTracks!==panelTracks){panelTracks=viewTracks;playSrc=viewSrc;panelIdx=-1;document.querySelector(".p-foot").classList.toggle("no-nav",!panelTracks.some(x=>x.id))}
+  if(!panelTracks[n]||!panelTracks[n].id){if(panelCtrl){panelUri=viewUri;panelCtrl.loadUri(viewUri);tryPlay()}else panelPlayer(viewUri,"");return}
   if(n===panelIdx&&panelCtrl){if(panelPaused)tryPlay();else panelCtrl.pause();return}
   playRow(n)});
 function closePanel(hard){
@@ -616,7 +624,7 @@ function closePanel(hard){
 document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]");if(c){e.preventDefault();openPanel(c.dataset.kind,+c.dataset.i)}});
 scrim.addEventListener("click",()=>closePanel());document.getElementById("p-close").addEventListener("click",()=>closePanel());
 document.getElementById("p-dock-x").addEventListener("click",()=>closePanel(true));
-document.getElementById("p-dock-open").addEventListener("click",()=>{panel.classList.remove("docked");scrim.classList.add("on")});
+document.getElementById("p-dock-open").addEventListener("click",()=>{if(playSrc&&viewTracks!==panelTracks)openPanel(...playSrc);else{panel.classList.remove("docked");scrim.classList.add("on")}});
 addEventListener("keydown",e=>{if(e.key==="Escape"&&!panel.classList.contains("docked"))closePanel()});
 
 /* ---------- Consenso cookie (player Spotify) ---------- */
@@ -639,7 +647,7 @@ function openTrack(t){window._lastOpen=()=>openTrack(t);panel.classList.remove("
   document.getElementById("p-cover").innerHTML=t.img?`<img class="art" src="${t.img}" alt="">`:"";
   document.getElementById("p-title").textContent=t.t;document.getElementById("p-by").textContent=t.a;
   document.getElementById("p-sub").textContent="";
-  panelTracks=[];panelIdx=-1;document.querySelector(".p-foot").classList.add("no-nav");document.getElementById("p-list").innerHTML="";document.getElementById("p-open").href=t.url;
+  panelTracks=[];viewTracks=panelTracks;panelIdx=-1;document.querySelector(".p-foot").classList.add("no-nav");document.getElementById("p-list").innerHTML="";document.getElementById("p-open").href=t.url;
   if(MOBILE&&t.id)bigPlayer("spotify:track:"+t.id,t.url);else{panel.classList.remove("m");panelPlayer(t.id?"spotify:track:"+t.id:"",t.url);}
   panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
 }
