@@ -245,6 +245,16 @@
   .p-nav button:disabled{opacity:.35;pointer-events:none}
   .p-foot.no-nav .p-nav{display:none}
   .p-big{display:none}
+  .p-dock{display:none}
+  .panel.docked{top:auto;right:auto;left:50%;bottom:16px;width:min(760px,calc(100vw - 24px));transform:translateX(-50%);transition:none;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  .panel.docked .p-top,.panel.docked .p-list,.panel.docked .p-big,.panel.docked .p-close,.panel.docked .p-hint{display:none}
+  .panel.docked .p-foot{border-top:0;flex-direction:row;align-items:center;padding:8px}
+  .panel.docked .p-foot .p-player{flex:1;min-width:0}
+  .panel.docked .p-nav{gap:6px}.panel.docked .p-nav .pp{width:44px;height:44px}
+  .panel.docked .p-dock{display:flex;flex-direction:column;gap:6px}
+  .p-dock button{width:32px;height:32px;border-radius:50%;background:var(--surface-2);color:var(--soft);display:grid;place-items:center}
+  .p-dock button:hover{color:var(--text)}
+  @media(max-width:640px){.panel.docked .p-nav #p-prev,.panel.docked .p-nav #p-next{display:none}}
   .panel.m .p-list,.panel.m .p-foot{display:none}
   .panel.m .p-big{display:block;flex:1;min-height:0;padding:14px 14px 16px}
   .panel.m .p-big iframe{width:100%;height:100%;border:0;border-radius:14px;display:block}
@@ -424,7 +434,7 @@
   <div class="p-top"><div class="p-cover" id="p-cover"></div><div><h3 id="p-title"></h3><div class="by" id="p-by"></div><div class="sub" id="p-sub"></div><a class="p-open" id="p-open" href="#" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg>Apri su Spotify</a></div></div>
   <div class="p-big" id="p-big"></div>
   <div class="p-list"><ol id="p-list"></ol></div>
-  <div class="p-foot"><div class="p-nav"><button type="button" id="p-prev" aria-label="Brano precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button><button type="button" id="p-pp" class="pp" aria-label="Play o pausa"><svg class="i-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button><button type="button" id="p-next" aria-label="Brano successivo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button></div><div class="p-hint" id="p-hint">Tocca <b>▶</b> qui sotto per ascoltare</div><div class="p-player" id="p-player"></div></div>
+  <div class="p-foot"><div class="p-nav"><button type="button" id="p-prev" aria-label="Brano precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button><button type="button" id="p-pp" class="pp" aria-label="Play o pausa"><svg class="i-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="i-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button><button type="button" id="p-next" aria-label="Brano successivo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button></div><div class="p-hint" id="p-hint">Tocca <b>▶</b> qui sotto per ascoltare</div><div class="p-player" id="p-player"></div><div class="p-dock"><button type="button" id="p-dock-open" aria-label="Apri la lista"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" id="p-dock-x" aria-label="Chiudi il player"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></div>
 </aside>
 
 <div class="mini" id="mini" aria-hidden="true"><div id="mini-embed"></div><button class="x" id="mini-x" aria-label="Chiudi player"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -538,7 +548,9 @@ function panelPlayer(uri,url){
   if(!SpotiAPI){caricaApiSpotify();const id=uri.split(":");pl.innerHTML=`<iframe src="https://open.spotify.com/embed/${id[1]}/${id[2]}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;return}
   if(panelCtrl&&panelEl&&pl.contains(panelEl)){panelCtrl.loadUri(uri);return}
   pl.innerHTML="";panelEl=document.createElement("div");pl.appendChild(panelEl);
-  SpotiAPI.createController(panelEl,{uri,width:"100%",height:80,theme:"dark"},c=>{panelCtrl=c;c.addListener("ready",()=>{if(panelWant)tryPlay()});
+  const tent=(panelPlayer.tent||0);let pronto=false;
+  setTimeout(()=>{if(!pronto&&panelUri===uri&&tent<1){panelPlayer.tent=tent+1;panelCtrl=null;panelEl=null;panelPlayer(uri,url)}else panelPlayer.tent=0},8000);
+  SpotiAPI.createController(panelEl,{uri,width:"100%",height:80,theme:"dark"},c=>{panelCtrl=c;c.addListener("ready",()=>{pronto=true;panelPlayer.tent=0});c.addListener("ready",()=>{if(panelWant)tryPlay()});
     c.addListener("playback_update",ev=>{const d=ev.data||{};
       panelPos=d.position||0;panelPaused=!!d.isPaused;if(!d.isPaused)hint(false);if(!d.isPaused&&panelIdx>=0){const r=document.querySelectorAll("#p-list li")[panelIdx];if(r&&!r.classList.contains("on"))r.classList.add("on")}document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
       if(!d.isPaused&&miniCtrl)miniCtrl.pause();
@@ -562,7 +574,7 @@ const MOBILE=matchMedia("(pointer: coarse)").matches;
 function bigPlayer(uri,url){const [,tipo,id]=uri.split(":");
   panel.classList.add("m");
   document.getElementById("p-big").innerHTML=!spotifyOk()?gateHTML(url):`<iframe src="https://open.spotify.com/embed/${tipo}/${id}?theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;}
-function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);
+function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);panel.classList.remove("docked");
   const it=kind==="a"?albums[i]:playlists[i];
   document.getElementById("p-cover").innerHTML=kind==="a"?artAlbum(it):artPlaylist(it);
   document.getElementById("p-title").textContent=it.title;
@@ -596,16 +608,16 @@ document.getElementById("p-list").addEventListener("click",e=>{const li=e.target
   if(!panelTracks[n]||!panelTracks[n].id){if(panelCtrl){panelCtrl.loadUri(panelUri);tryPlay()}return}
   if(n===panelIdx&&panelCtrl){if(panelPaused)tryPlay();else panelCtrl.pause();return}
   playRow(n)});
-function closePanel(){
-  if(panelCtrl&&!panelPaused&&panelIdx>=0&&panelTracks[panelIdx]&&panelTracks[panelIdx].id){
-    const q={tracks:panelTracks,idx:panelIdx},start=Math.floor(panelPos/1000);
-    try{panelCtrl.pause()}catch(e){}
-    setTimeout(()=>{miniQueue=q;playMini(q.tracks[q.idx],start)},0);
-  }
+function closePanel(hard){
+  if(hard!==true&&panelCtrl&&!panelPaused&&!panel.classList.contains("m")){
+    panel.classList.add("docked");scrim.classList.remove("on");return}
+  panel.classList.remove("docked");
   panelPaused=true;panel.classList.remove("on");scrim.classList.remove("on");panel.setAttribute("aria-hidden","true");if(panelCtrl){try{panelCtrl.destroy()}catch(e){}}hint(false);document.getElementById("p-big").innerHTML="";panelCtrl=null;panelEl=null;panelIdx=-1;document.getElementById("p-pp").classList.remove("playing");document.getElementById("p-player").innerHTML=""}
 document.addEventListener("click",e=>{const c=e.target.closest(".card[data-kind]");if(c){e.preventDefault();openPanel(c.dataset.kind,+c.dataset.i)}});
-scrim.addEventListener("click",closePanel);document.getElementById("p-close").addEventListener("click",closePanel);
-addEventListener("keydown",e=>{if(e.key==="Escape")closePanel()});
+scrim.addEventListener("click",()=>closePanel());document.getElementById("p-close").addEventListener("click",()=>closePanel());
+document.getElementById("p-dock-x").addEventListener("click",()=>closePanel(true));
+document.getElementById("p-dock-open").addEventListener("click",()=>{panel.classList.remove("docked");scrim.classList.add("on")});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!panel.classList.contains("docked"))closePanel()});
 
 /* ---------- Consenso cookie (player Spotify) ---------- */
 let CONSENSO=null;try{CONSENSO=localStorage.getItem("cc-spotify")}catch(e){}
@@ -623,7 +635,7 @@ document.addEventListener("click",e=>{const g=e.target.closest(".gate-ok");if(!g
   else if(window._lastOpen){window._lastOpen()}});
 
 /* ---------- Top 10 e "in cuffia adesso" ---------- */
-function openTrack(t){window._lastOpen=()=>openTrack(t);
+function openTrack(t){window._lastOpen=()=>openTrack(t);panel.classList.remove("docked");
   document.getElementById("p-cover").innerHTML=t.img?`<img class="art" src="${t.img}" alt="">`:"";
   document.getElementById("p-title").textContent=t.t;document.getElementById("p-by").textContent=t.a;
   document.getElementById("p-sub").textContent="";
@@ -639,7 +651,7 @@ function fillTop(){
 /* Top 10: player in basso che parte subito */
 let SpotiAPI=null,miniCtrl=null,miniPending=null,miniQueue=null,miniEnd=false;
 window.onSpotifyIframeApiReady=api=>{SpotiAPI=api;if(miniPending){playMini(miniPending);miniPending=null}};
-function playMini(t,start){miniEnd=false;if(!t.url)t={...t,url:"https://open.spotify.com/track/"+t.id};
+function playMini(t,start){miniEnd=false;if(panel.classList.contains("docked"))closePanel(true);if(!t.url)t={...t,url:"https://open.spotify.com/track/"+t.id};
   const box=document.getElementById("mini");box.classList.add("on");box.setAttribute("aria-hidden","false");
   const uri="spotify:track:"+t.id;
   if(!spotifyOk()){document.getElementById("mini-embed").innerHTML=gateHTML(t.url);miniPending=t;return;}
@@ -699,7 +711,7 @@ function route(){
   if(v==="best-albums")renderA(); else if(v==="caffe-in-cuffia")renderC();
   if(v==="grazie"&&playlists.length){const last=[...playlists].sort((a,b)=>(b.num||0)-(a.num||0))[0];
     document.getElementById("g-open").onclick=e=>{e.preventDefault();openPanel("c",playlists.indexOf(last))};}
-  if(v!=="grazie")closePanel();
+  if(v!=="grazie"&&!panel.classList.contains("docked"))closePanel();
   document.getElementById("nl-wrap").style.display=(v==="grazie"||v==="privacy")?"none":"";window.scrollTo(0,0);
 }
 addEventListener("hashchange",route);
