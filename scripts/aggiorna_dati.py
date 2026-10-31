@@ -226,7 +226,21 @@ def main():
             return 1 if senza_id(v) else 2
 
         limite = CONFIG.get("max_letture_per_esecuzione", 200)
-        for p in sorted(tutte, key=lambda p: (da_fare(p), priorita(p))):
+        def mescola(lista):
+            # dentro ogni gruppo: prima le Caffè nuove, poi 2 album e 1 Caffè vecchia a turno,
+            # così le Caffè più vecchie arrivano un po' a ogni giro invece di aspettare tutti gli album
+            nuove = [p for p in lista if priorita(p)[0] == 0]
+            alb = [p for p in lista if priorita(p)[0] == 1]
+            vecchie = [p for p in lista if priorita(p)[0] == 2]
+            out = list(nuove)
+            while alb or vecchie:
+                out += alb[:2] + vecchie[:1]
+                alb, vecchie = alb[2:], vecchie[1:]
+            return out
+
+        ordinate = sorted(tutte, key=lambda p: (da_fare(p), priorita(p)))
+        ordine = mescola([p for p in ordinate if da_fare(p) == 0]) + mescola([p for p in ordinate if da_fare(p) == 1])
+        for p in ordine:
             if da_fare(p) == 2:
                 continue
             totale = (p.get("items") or p.get("tracks") or {}).get("total", 0)
