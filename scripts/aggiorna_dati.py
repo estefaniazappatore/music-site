@@ -53,8 +53,9 @@ def client():
         open_browser=False,
         cache_handler=MemoryCacheHandler(token_info=token),
     )
-    # retries bassi: se Spotify ci blocca per ore non ha senso aspettare
-    return spotipy.Spotify(auth_manager=auth, retries=3, status_retries=3, backoff_factor=2)
+    # nessun nuovo tentativo automatico: se Spotify dice "riprova tra 3 ore" ci fermiamo subito
+    # e riprendiamo al giro successivo, invece di tenere GitHub fermo ad aspettare
+    return spotipy.Spotify(auth_manager=auth, retries=0, status_retries=0, requests_timeout=20)
 
 
 def chiama(fn, *args, **kw):
