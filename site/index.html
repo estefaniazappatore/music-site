@@ -552,6 +552,14 @@ function fillIntro(){
 
 /* ---------- Pannello dettaglio con tracklist e player ---------- */
 const panel=document.getElementById("panel"),scrim=document.getElementById("scrim");
+/* fine brano: ignoro gli aggiornamenti "vecchi" che arrivano subito dopo aver caricato un brano nuovo
+   (riportano ancora la posizione finale del brano precedente e facevano saltare una canzone) */
+function fineBrano(st,d){
+  if(!(d.duration>0))return false;
+  if(st.fresh){if(d.position<5000&&d.position<d.duration-5000)st.fresh=false;st.last=d.position;return false}
+  const fine=d.position>=d.duration-300||(d.isPaused&&(d.position>=d.duration-1200||(d.position<1000&&st.last>=d.duration-4000)));
+  st.last=d.position;return fine}
+const pState={fresh:true,last:0},mState={fresh:true,last:0};
 let playSrc=null,viewSrc=null,viewTracks=[],viewUri="",hintT=null,panelPaused=true,panelWant=false,panelPos=0,panelCtrl=null,panelTracks=[],panelIdx=-1,panelUri="",panelEnd=false,panelEl=null;
 function panelPlayer(uri,url){
   const pl=document.getElementById("p-player");panelUri=uri;
@@ -563,10 +571,10 @@ function panelPlayer(uri,url){
   const tent=(panelPlayer.tent||0);let pronto=false;
   setTimeout(()=>{if(!pronto&&panelUri===uri&&tent<1){panelPlayer.tent=tent+1;panelCtrl=null;panelEl=null;panelPlayer(uri,url)}else panelPlayer.tent=0},8000);
   SpotiAPI.createController(panelEl,{uri,width:"100%",height:80,theme:"dark"},c=>{panelCtrl=c;c.addListener("ready",()=>{pronto=true;panelPlayer.tent=0});c.addListener("ready",()=>{if(panelWant)tryPlay()});
-    c.addListener("playback_update",ev=>{const d=ev.data||{};
+    c.addListener("playback_update",ev=>{const d=ev.data||{};pronto=true;
       panelPos=d.position||0;panelPaused=!!d.isPaused;syncCover();if(!d.isPaused)hint(false);if(!d.isPaused&&panelIdx>=0){const r=qRows()[panelIdx];if(r&&!r.classList.contains("on"))r.classList.add("on")}document.getElementById("p-pp").classList.toggle("playing",!d.isPaused);const li=document.querySelector("#p-list li.on");if(li)li.classList.toggle("paused",!!d.isPaused);
       if(!d.isPaused&&miniCtrl)miniCtrl.pause();
-      if(panelIdx>=0&&d.duration>0&&d.position>=d.duration-800&&!panelEnd){panelEnd=true;setTimeout(()=>stepRow(1),600)}});
+      if(panelIdx>=0&&!panelEnd&&fineBrano(pState,d)){panelEnd=true;stepRow(1)}});
   });
 }
 const qRows=()=>viewTracks===panelTracks?document.querySelectorAll("#p-list li"):[];
@@ -579,7 +587,7 @@ function playRow(i){
   const t=panelTracks[i];const rows=qRows();
   rows.forEach(r=>r.classList.remove("on","paused"));
   if(!t||!t.id){panelIdx=-1;return}
-  panelIdx=i;panelEnd=false;panelWant=true;if(rows[i])rows[i].classList.add("on");
+  panelIdx=i;panelEnd=false;pState.fresh=true;panelWant=true;if(rows[i])rows[i].classList.add("on");
   if(!spotifyOk()||!SpotiAPI||!panelCtrl){panelPlayer("spotify:track:"+t.id,"https://open.spotify.com/track/"+t.id);return}
   panelCtrl.loadUri("spotify:track:"+t.id);tryPlay();
 }
@@ -595,7 +603,8 @@ function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);panel.classLis
   document.getElementById("p-by").textContent=kind==="a"?it.artist:"Playlist di Estefania";
   document.getElementById("p-sub").textContent=kind==="a"?`${fmt(it.date)} · ${it.tracks.length} brani`:`${it.tracks.length} brani · ${mins(it.tracks)} min`;
   const uriIt=it.id?`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`:"";
-  const occupato=!MOBILE&&panelCtrl&&!panelPaused;
+  const stesso=playSrc&&playSrc[0]===kind&&playSrc[1]===i;
+  const occupato=!MOBILE&&panelCtrl&&(!panelPaused||(stesso&&panelIdx>=0));
   viewTracks=it.tracks;viewUri=uriIt;viewSrc=[kind,i];
   if(!occupato){playSrc=viewSrc;panelTracks=it.tracks;panelIdx=-1;panelWant=false;}
   document.getElementById("p-list").innerHTML=it.tracks.map((x,n)=>`<li data-row="${n}"${x.id?' class="has-id"':''}><div><b>${esc(x.t)}</b><small>${esc(x.a)}</small></div><span class="dr"><i class="eq"><i></i><i></i><i></i></i>${dur(x.ms)}</span></li>`).join("");
@@ -608,7 +617,7 @@ function openPanel(kind,i){window._lastOpen=()=>openPanel(kind,i);panel.classLis
     const r=qRows()[panelIdx];if(r)r.classList.add("on");
     panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");panel.querySelector(".p-list").scrollTop=0;syncCover();return}
   const primo=it.tracks.findIndex(x=>x.id);
-  if(primo>=0){panelIdx=primo;panelEnd=false;panelPlayer("spotify:track:"+it.tracks[primo].id,it.url)}
+  if(primo>=0){panelIdx=primo;panelEnd=false;pState.fresh=true;panelPlayer("spotify:track:"+it.tracks[primo].id,it.url)}
   else panelPlayer(it.id?`spotify:${kind==="a"?"album":"playlist"}:${kind==="a"?it.id:(it.playlist||it.id)}`:"",it.url);
   panel.classList.add("on");scrim.classList.add("on");panel.setAttribute("aria-hidden","false");
   panel.querySelector(".p-list").scrollTop=0;syncCover();
@@ -638,7 +647,7 @@ document.getElementById("p-list").addEventListener("click",e=>{const li=e.target
   if(n===panelIdx&&panelCtrl){if(panelPaused)tryPlay();else panelCtrl.pause();return}
   playRow(n)});
 function closePanel(hard){
-  if(hard!==true&&panelCtrl&&!panelPaused&&!panel.classList.contains("m")){
+  if(hard!==true&&panelCtrl&&(!panelPaused||(panelIdx>=0&&panelPos>0))&&!panel.classList.contains("m")){
     panel.classList.add("docked");scrim.classList.remove("on");return}
   panel.classList.remove("docked");
   panelPaused=true;panel.classList.remove("on");scrim.classList.remove("on");panel.setAttribute("aria-hidden","true");if(panelCtrl){try{panelCtrl.destroy()}catch(e){}}hint(false);document.getElementById("p-big").innerHTML="";panelCtrl=null;panelEl=null;panelIdx=-1;document.getElementById("p-pp").classList.remove("playing");document.getElementById("p-player").innerHTML=""}
@@ -680,7 +689,7 @@ function fillTop(){
 /* Top 10: player in basso che parte subito */
 let SpotiAPI=null,miniCtrl=null,miniPending=null,miniQueue=null,miniEnd=false;
 window.onSpotifyIframeApiReady=api=>{SpotiAPI=api;if(miniPending){playMini(miniPending);miniPending=null}};
-function playMini(t,start){miniEnd=false;if(panel.classList.contains("docked"))closePanel(true);if(!t.url)t={...t,url:"https://open.spotify.com/track/"+t.id};
+function playMini(t,start){miniEnd=false;mState.fresh=true;if(panel.classList.contains("docked"))closePanel(true);if(!t.url)t={...t,url:"https://open.spotify.com/track/"+t.id};
   const box=document.getElementById("mini");box.classList.add("on");box.setAttribute("aria-hidden","false");
   const uri="spotify:track:"+t.id;
   if(!spotifyOk()){document.getElementById("mini-embed").innerHTML=gateHTML(t.url);miniPending=t;return;}
@@ -691,9 +700,9 @@ function playMini(t,start){miniEnd=false;if(panel.classList.contains("docked"))c
   SpotiAPI.createController(el,{uri,width:"100%",height:80,theme:"dark"},c=>{miniCtrl=c;
     c.addListener("ready",()=>{if(start)c.loadUri(uri,false,start);c.play()});
     c.addListener("playback_update",ev=>{const d=ev.data||{};if(!d.isPaused&&panelCtrl)panelCtrl.pause();
-      if(miniQueue&&d.duration>0&&d.position>=d.duration-800&&!miniEnd){miniEnd=true;
+      if(miniQueue&&!miniEnd&&fineBrano(mState,d)){miniEnd=true;
         let i=miniQueue.idx+1;while(i<miniQueue.tracks.length&&!miniQueue.tracks[i].id)i++;
-        if(i<miniQueue.tracks.length){miniQueue.idx=i;setTimeout(()=>playMini(miniQueue.tracks[i]),600)}else miniQueue=null}});});
+        if(i<miniQueue.tracks.length){miniQueue.idx=i;playMini(miniQueue.tracks[i])}else miniQueue=null}});});
 }
 document.getElementById("mini-x").addEventListener("click",()=>{
   miniQueue=null;if(miniCtrl)miniCtrl.pause();const box=document.getElementById("mini");box.classList.remove("on");box.setAttribute("aria-hidden","true");
